@@ -151,6 +151,3 @@ Contributions are welcome! If you want to contribute to **Resolve Desk**:
 
 Distributed under the **ISC License**. See `LICENSE` for more information.
 
----
-
-<p center="text-center">Made with ❤️ for Students and Educational Institutions.</p>
