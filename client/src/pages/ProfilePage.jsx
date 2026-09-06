@@ -53,10 +53,11 @@ const ProfilePage = ({ user, onUpdateUser }) => {
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{user?.name}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
-              <span className="badge" style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }}>
-                <Shield size={12} /> Student Account
+              <span className="badge" style={user?.role === 'admin' ? { background: '#0f172a', color: '#60a5fa', border: '1px solid #3b82f6' } : { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }}>
+                <Shield size={12} /> {user?.role === 'admin' ? 'Administrator Account' : 'Student Account'}
               </span>
             </div>
+
           </div>
         </div>
 

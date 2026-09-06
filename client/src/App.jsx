@@ -4,6 +4,10 @@ import DashboardPage from './pages/DashboardPage';
 import NewComplaintPage from './pages/NewComplaintPage';
 import MyComplaintsPage from './pages/MyComplaintsPage';
 import ProfilePage from './pages/ProfilePage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminComplaintsPage from './pages/admin/AdminComplaintsPage';
+import AdminStudentsPage from './pages/admin/AdminStudentsPage';
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { getProfileApi } from './services/api';
@@ -14,7 +18,16 @@ const App = () => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
   });
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem('user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        if (u.role === 'admin') return 'admin-dashboard';
+      } catch (e) {}
+    }
+    return 'dashboard';
+  });
   const [loadingProfile, setLoadingProfile] = useState(false);
 
   useEffect(() => {
@@ -38,12 +51,23 @@ const App = () => {
     }
   }, [token]);
 
+  // Adjust active tab if user role changes or tab does not match role
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin' && activeTab === 'dashboard') {
+        setActiveTab('admin-dashboard');
+      } else if (user.role !== 'admin' && activeTab.startsWith('admin-')) {
+        setActiveTab('dashboard');
+      }
+    }
+  }, [user, activeTab]);
+
   const handleLoginSuccess = (userData, userToken) => {
     setUser(userData);
     setToken(userToken);
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));
-    setActiveTab('dashboard');
+    setActiveTab(userData.role === 'admin' ? 'admin-dashboard' : 'dashboard');
   };
 
   const handleLogout = () => {
@@ -71,9 +95,12 @@ const App = () => {
     );
   }
 
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div className="app-container">
       <Sidebar
+        user={user}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
@@ -82,18 +109,37 @@ const App = () => {
       <div className="main-wrapper">
         <Navbar user={user} />
 
-        {activeTab === 'dashboard' && (
+        {/* Admin Navigation Views */}
+        {isAdmin && activeTab === 'admin-dashboard' && (
+          <AdminDashboardPage user={user} onNavigate={setActiveTab} />
+        )}
+
+        {isAdmin && activeTab === 'admin-complaints' && (
+          <AdminComplaintsPage onNavigate={setActiveTab} />
+        )}
+
+        {isAdmin && activeTab === 'admin-students' && (
+          <AdminStudentsPage onNavigate={setActiveTab} />
+        )}
+
+        {isAdmin && activeTab === 'admin-analytics' && (
+          <AdminAnalyticsPage onNavigate={setActiveTab} />
+        )}
+
+        {/* Student Navigation Views */}
+        {!isAdmin && activeTab === 'dashboard' && (
           <DashboardPage user={user} onNavigate={setActiveTab} />
         )}
 
-        {activeTab === 'new-complaint' && (
+        {!isAdmin && activeTab === 'new-complaint' && (
           <NewComplaintPage onNavigate={setActiveTab} />
         )}
 
-        {activeTab === 'my-complaints' && (
+        {!isAdmin && activeTab === 'my-complaints' && (
           <MyComplaintsPage onNavigate={setActiveTab} />
         )}
 
+        {/* Shared Profile View */}
         {activeTab === 'profile' && (
           <ProfilePage user={user} onUpdateUser={handleUpdateUser} />
         )}

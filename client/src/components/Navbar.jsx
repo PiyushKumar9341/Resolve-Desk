@@ -26,7 +26,14 @@ const Navbar = ({ user }) => {
             {getInitial(user?.name)}
           </div>
           <div className="user-info-text">
-            <span className="user-name">{user?.name || 'Student'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span className="user-name">{user?.name || (user?.role === 'admin' ? 'Administrator' : 'Student')}</span>
+              {user?.role === 'admin' && (
+                <span style={{ fontSize: '0.65rem', fontWeight: 800, background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)', color: '#ffffff', padding: '0.15rem 0.45rem', borderRadius: '6px', letterSpacing: '0.04em' }}>
+                  ADMIN
+                </span>
+              )}
+            </div>
             <span className="user-email">{user?.email}</span>
           </div>
         </div>
