@@ -25,13 +25,30 @@ function generateToken(userId) {
 // @access  Public
 const sendOtp = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, roleMode = 'student' } = req.body;
 
     if (!email || !email.includes('@')) {
       return res.status(400).json({ message: 'Please enter a valid email address.' });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    // Early Role Pre-Check before generating or sending OTP
+    const existingUser = await User.findOne({ email: normalizedEmail });
+
+    if (roleMode === 'admin') {
+      if (!existingUser || existingUser.role !== 'admin') {
+        return res.status(403).json({
+          message: 'Access Denied: This email does not have administrator privileges. Please switch to Student Login.'
+        });
+      }
+    } else if (roleMode === 'student') {
+      if (existingUser && existingUser.role === 'admin') {
+        return res.status(400).json({
+          message: 'Administrator Account Detected: Please switch to the Admin Portal tab to log in.'
+        });
+      }
+    }
 
     // Check resend cooldown only on active unused OTPs for the same email
     const recentOtp = await Otp.findOne({ email: normalizedEmail, used: false }).sort({ createdAt: -1 });
