@@ -55,6 +55,11 @@ export const toggleUpvoteApi = async (id) => {
   return response.data;
 };
 
+export const checkDuplicateComplaintApi = async (params = {}) => {
+  const response = await api.get('/complaints/check-duplicate', { params });
+  return response.data;
+};
+
 // Admin Complaint Services
 export const getAdminStatsApi = async () => {
   const response = await api.get('/complaints/admin/stats');

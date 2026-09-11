@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { createComplaintApi } from '../services/api';
-import { Send, AlertCircle, CheckCircle2, FilePlus, HelpCircle, Home, GraduationCap, Building, Utensils, MoreHorizontal, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createComplaintApi, checkDuplicateComplaintApi, toggleUpvoteApi } from '../services/api';
+import { Send, AlertCircle, CheckCircle2, FilePlus, HelpCircle, Home, GraduationCap, Building, Utensils, MoreHorizontal, MapPin, Flame } from 'lucide-react';
 
 const CATEGORY_ITEMS = [
   { id: 'Hostel', label: 'Hostel', icon: Home },
@@ -27,6 +27,50 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Duplicate detection state
+  const [duplicates, setDuplicates] = useState([]);
+  const [upvotingDupId, setUpvotingDupId] = useState(null);
+
+  useEffect(() => {
+    if (!title || title.trim().length < 3) {
+      setDuplicates([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await checkDuplicateComplaintApi({
+          title,
+          blockLocation
+        });
+        if (res.success) {
+          setDuplicates(res.duplicates || []);
+        }
+      } catch (err) {
+        console.error('Duplicate check error:', err);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [title, blockLocation]);
+
+  const handleUpvoteExisting = async (dupId) => {
+    setUpvotingDupId(dupId);
+    try {
+      const res = await toggleUpvoteApi(dupId);
+      if (res.success) {
+        setSuccessMsg(`Upvoted existing complaint! Redirecting to Dashboard...`);
+        setTimeout(() => {
+          onNavigate('dashboard');
+        }, 1200);
+      }
+    } catch (err) {
+      console.error('Upvote error:', err);
+    } finally {
+      setUpvotingDupId(null);
+    }
+  };
 
   const handleCategoryChange = (newCat) => {
     setCategory(newCat);
@@ -113,6 +157,43 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
               DIRECT DASHBOARD SELECTION
             </span>
           </div>
+
+          {/* Duplicate Complaint Detection Alert Banner */}
+          {duplicates.length > 0 && (
+            <div style={{ background: '#fff7ed', border: '1.5px solid #ffedd5', padding: '1rem 1.25rem', borderRadius: '16px', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, color: '#c2410c', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                <Flame size={18} color="#f97316" />
+                Similar Active Grievance Detected in {blockLocation}:
+              </div>
+              {duplicates.map((dup) => (
+                <div key={dup._id} style={{ background: '#ffffff', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid #fed7aa', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2563eb', background: '#eff6ff', padding: '0.15rem 0.5rem', borderRadius: '6px', marginRight: '0.5rem' }}>
+                      {dup.complaintId}
+                    </span>
+                    <strong style={{ fontSize: '0.92rem', color: '#1e293b' }}>{dup.title}</strong>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>
+                      {dup.category} &bull; {dup.subCategory} &bull; <span style={{ color: '#f97316', fontWeight: 700 }}>🔥 {dup.upvoteCount} Upvotes</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleUpvoteExisting(dup._id)}
+                    disabled={upvotingDupId === dup._id}
+                    className="btn btn-primary"
+                    style={{ fontSize: '0.82rem', padding: '0.45rem 0.9rem', background: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', border: 'none' }}
+                  >
+                    <Flame size={14} />
+                    {upvotingDupId === dup._id ? 'Upvoting...' : '+1 Upvote Existing Instead'}
+                  </button>
+                </div>
+              ))}
+              <p style={{ fontSize: '0.78rem', color: '#9a3412', marginTop: '0.6rem', marginBottom: 0 }}>
+                💡 <em>Upvoting an existing grievance boosts its priority toward <strong>🚨 URGENT</strong> faster than filing a duplicate!</em>
+              </p>
+            </div>
+          )}
 
           <div className="form-group">
             <label className="form-label" htmlFor="title">

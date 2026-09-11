@@ -675,6 +675,60 @@ const getAdminAnalytics = async (req, res) => {
   }
 };
 
+// @desc    Check potential duplicate grievances by keyword/title similarity
+// @route   GET /api/complaints/check-duplicate
+// @access  Private (Student & Admin)
+const checkDuplicateComplaint = async (req, res) => {
+  try {
+    const { title = '', blockLocation = '' } = req.query;
+
+    if (!title.trim() || title.trim().length < 3) {
+      return res.status(200).json({ success: true, duplicates: [] });
+    }
+
+    const cleanTitle = title.trim();
+    const words = cleanTitle.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+    const query = {
+      status: { $in: ['Pending', 'In Progress'] }
+    };
+
+    if (blockLocation && blockLocation !== 'All') {
+      query.blockLocation = blockLocation;
+    }
+
+    if (words.length > 0) {
+      const regexPattern = words.join('|');
+      query.title = { $regex: regexPattern, $options: 'i' };
+    }
+
+    const matches = await Complaint.find(query)
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate('studentId', 'name email');
+
+    const formatted = matches.map(c => ({
+      _id: c._id,
+      complaintId: c.complaintId,
+      title: c.title,
+      category: c.category,
+      subCategory: c.subCategory || 'General',
+      blockLocation: c.blockLocation || 'Other',
+      upvoteCount: (c.upvotes || []).length,
+      priority: c.priority || 'Medium',
+      createdAt: c.createdAt
+    }));
+
+    return res.status(200).json({
+      success: true,
+      duplicates: formatted
+    });
+  } catch (error) {
+    console.error('[Check Duplicate Error]', error);
+    return res.status(500).json({ message: 'Server error while checking duplicates.' });
+  }
+};
+
 module.exports = {
   createComplaint,
   getMyComplaints,
@@ -684,7 +738,8 @@ module.exports = {
   updateComplaintAdmin,
   getAdminAnalytics,
   toggleUpvote,
-  getPublicComplaints
+  getPublicComplaints,
+  checkDuplicateComplaint
 };
 
 

@@ -10,7 +10,8 @@ const {
   updateComplaintAdmin,
   getAdminAnalytics,
   toggleUpvote,
-  getPublicComplaints
+  getPublicComplaints,
+  checkDuplicateComplaint
 } = require('../controllers/complaintController');
 
 // Student & Public endpoints
@@ -18,6 +19,7 @@ router.post('/', protect, createComplaint);
 router.get('/my', protect, getMyComplaints);
 router.get('/stats', protect, getStats);
 router.get('/public', protect, getPublicComplaints);
+router.get('/check-duplicate', protect, checkDuplicateComplaint);
 router.post('/:id/upvote', protect, toggleUpvote);
 
 // Admin endpoints (strictly registered before any future /:id parameterized route)
