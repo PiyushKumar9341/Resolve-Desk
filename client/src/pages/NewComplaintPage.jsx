@@ -12,10 +12,10 @@ const CATEGORY_ITEMS = [
 
 const SUB_CATEGORIES = {
   Hostel: ['Wi-Fi & Network', 'Plumbing & Water', 'Electricity & Fan/AC', 'Cleanliness & Hygiene', 'Furniture & Bed'],
-  Academic: ['Classroom Smart Board/Projector', 'Lab Equipment & Computers', 'Timetable & Attendance Issue', 'Exam & Marks Inquiry'],
+  Academic: ['Classroom Smart Board/Projector', 'Lab Equipment & Computers', 'Department Equipment', 'General Academic Facility'],
   Infrastructure: ['Lift & Elevator', 'Washroom & Hygiene', 'Air Conditioning', 'Lighting & Electrical'],
   'Canteen & Mess': ['Food Quality & Hygiene', 'Overcharging / Pricing', 'Seating & Cleanliness', 'Billing & Queue'],
-  Other: ['General Inquiry', 'Other']
+  Other: ['General Campus Concern', 'Other']
 };
 
 const GCET_BLOCKS = [
