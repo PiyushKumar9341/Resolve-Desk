@@ -5,26 +5,43 @@ import {
   FileText, 
   User, 
   LogOut, 
-  GraduationCap 
+  GraduationCap,
+  ShieldCheck,
+  Users,
+  BarChart3
 } from 'lucide-react';
 
-const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
-  const menuItems = [
+const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
+  const isAdmin = user?.role === 'admin';
+
+  const studentMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'new-complaint', label: 'New Complaint', icon: PlusCircle },
     { id: 'my-complaints', label: 'My Complaints', icon: FileText },
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
+  const adminMenuItems = [
+    { id: 'admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'admin-complaints', label: 'Grievances', icon: FileText },
+    { id: 'admin-students', label: 'Students', icon: Users },
+    { id: 'admin-analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'profile', label: 'Admin Profile', icon: User },
+  ];
+
+  const menuItems = isAdmin ? adminMenuItems : studentMenuItems;
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <div className="brand-icon">
-          <GraduationCap size={24} />
+        <div className="brand-icon" style={isAdmin ? { background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)' } : {}}>
+          {isAdmin ? <ShieldCheck size={24} /> : <GraduationCap size={24} />}
         </div>
         <div>
-          <div className="brand-title">Student Portal</div>
-          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Grievance Portal</div>
+          <div className="brand-title">{isAdmin ? 'Admin Console' : 'Student Portal'}</div>
+          <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+            {isAdmin ? 'Authority Portal' : 'Grievance Portal'}
+          </div>
         </div>
       </div>
 

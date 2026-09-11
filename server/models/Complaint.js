@@ -29,13 +29,47 @@ const complaintSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'In Progress', 'Resolved'],
+      enum: ['Pending', 'In Progress', 'Resolved', 'Rejected'],
       default: 'Pending'
     },
     adminRemark: {
       type: String,
       default: ''
-    }
+    },
+    priority: {
+      type: String,
+      enum: ['Low', 'Medium', 'High', 'Urgent'],
+      default: 'Medium'
+    },
+    department: {
+      type: String,
+      default: ''
+    },
+    assignedStaff: {
+      type: String,
+      default: ''
+    },
+    statusHistory: [
+      {
+        status: {
+          type: String,
+          required: true,
+          enum: ['Pending', 'In Progress', 'Resolved', 'Rejected']
+        },
+        remark: {
+          type: String,
+          default: ''
+        },
+        changedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User'
+        },
+        changedAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ]
   },
   { timestamps: true }
 );

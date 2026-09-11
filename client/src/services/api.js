@@ -45,6 +45,38 @@ export const getStatsApi = async () => {
   return response.data;
 };
 
+// Admin Complaint Services
+export const getAdminStatsApi = async () => {
+  const response = await api.get('/complaints/admin/stats');
+  return response.data;
+};
+
+export const getAdminComplaintsApi = async (params = {}) => {
+  const response = await api.get('/complaints/admin/all', { params });
+  return response.data;
+};
+
+export const updateComplaintAdminApi = async (id, updateData) => {
+  const response = await api.put(`/complaints/admin/${id}`, updateData);
+  return response.data;
+};
+
+export const getAdminAnalyticsApi = async () => {
+  const response = await api.get('/complaints/admin/analytics');
+  return response.data;
+};
+
+// Admin Student Directory Services
+export const getStudentsAdminApi = async (params = {}) => {
+  const response = await api.get('/users/admin/students', { params });
+  return response.data;
+};
+
+export const getStudentDetailsAdminApi = async (id) => {
+  const response = await api.get(`/users/admin/students/${id}`);
+  return response.data;
+};
+
 // User Profile Services
 export const getProfileApi = async () => {
   const response = await api.get('/users/profile');
