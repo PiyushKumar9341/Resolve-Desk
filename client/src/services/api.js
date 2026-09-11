@@ -19,8 +19,8 @@ api.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error));
 
 // Auth Services
-export const sendOtpApi = async (email) => {
-  const response = await api.post('/auth/send-otp', { email });
+export const sendOtpApi = async (email, roleMode = 'student') => {
+  const response = await api.post('/auth/send-otp', { email, roleMode });
   return response.data;
 };
 

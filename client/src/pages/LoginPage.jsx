@@ -37,7 +37,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
     setLoading(true);
     try {
-      const data = await sendOtpApi(email);
+      const data = await sendOtpApi(email, roleMode);
       setSuccessMsg(data.message || 'OTP sent successfully to your email.');
       if (data.devOtp) {
         setDevOtpCode(data.devOtp);
@@ -95,7 +95,7 @@ const LoginPage = ({ onLoginSuccess }) => {
     setSuccessMsg('');
     setLoading(true);
     try {
-      const data = await sendOtpApi(email);
+      const data = await sendOtpApi(email, roleMode);
       setSuccessMsg('A new OTP has been sent to your email.');
       if (data.devOtp) {
         setDevOtpCode(data.devOtp);
