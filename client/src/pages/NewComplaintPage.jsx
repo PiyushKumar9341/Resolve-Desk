@@ -13,28 +13,16 @@ const CATEGORY_ITEMS = [
 const SUB_CATEGORIES = {
   Hostel: ['Wi-Fi & Network', 'Plumbing & Water', 'Electricity & Fan/AC', 'Cleanliness & Hygiene', 'Furniture & Bed'],
   Academic: ['Classroom Smart Board/Projector', 'Lab Equipment & Computers', 'Department Equipment', 'General Academic Facility'],
-  Infrastructure: ['Lift & Elevator', 'Washroom & Hygiene', 'Air Conditioning', 'Lighting & Electrical'],
+  Infrastructure: ['Washroom & Hygiene', 'Air Conditioning', 'Lighting & Electrical'],
   'Canteen & Mess': ['Food Quality & Hygiene', 'Seating & Cleanliness', 'General Canteen/Mess Facility'],
   Other: ['General Campus Concern', 'Other']
 };
 
-const GCET_BLOCKS = [
-  'Block A',
-  'Block B',
-  'Block C',
-  'Block D',
-  'GBS Block',
-  'Main Canteen / Food Court',
-  'Hostel Block',
-  'Sports Complex / Ground',
-  'Other'
-];
-
-const NewComplaintPage = ({ onNavigate }) => {
+const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Hostel');
   const [subCategory, setSubCategory] = useState('Wi-Fi & Network');
-  const [blockLocation, setBlockLocation] = useState('Block A');
+  const blockLocation = selectedBlock || 'Block A';
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -72,12 +60,12 @@ const NewComplaintPage = ({ onNavigate }) => {
       });
 
       if (res.success) {
-        setSuccessMsg('Grievance submitted successfully. Redirecting to Campus Feed...');
+        setSuccessMsg(`Grievance submitted successfully under ${blockLocation}! Redirecting to Dashboard...`);
         setTitle('');
         setDescription('');
-        
+
         setTimeout(() => {
-          onNavigate('campus-feed');
+          onNavigate('dashboard');
         }, 1200);
       }
     } catch (err) {
@@ -96,7 +84,7 @@ const NewComplaintPage = ({ onNavigate }) => {
           </div>
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Submit New Campus Grievance</h2>
-            <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Provide full details of your concern for GCET administration action</p>
+            <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Filing concern directly under <strong style={{ color: '#2563eb' }}>{blockLocation}</strong></p>
           </div>
         </div>
 
@@ -115,6 +103,17 @@ const NewComplaintPage = ({ onNavigate }) => {
         )}
 
         <form onSubmit={handleSubmit}>
+          {/* Locked Block Location Display */}
+          <div style={{ background: '#f0f9ff', padding: '0.85rem 1.1rem', borderRadius: '14px', border: '1px solid #bae6fd', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#0369a1', fontWeight: 700 }}>
+              <MapPin size={18} color="#0284c7" />
+              <span>GCET Campus Building: <strong style={{ color: '#0c4a6e', fontSize: '1.05rem' }}>{blockLocation}</strong></span>
+            </div>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, background: '#0284c7', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+              DIRECT DASHBOARD SELECTION
+            </span>
+          </div>
+
           <div className="form-group">
             <label className="form-label" htmlFor="title">
               Complaint Title <span style={{ color: '#ef4444' }}>*</span>
@@ -123,48 +122,28 @@ const NewComplaintPage = ({ onNavigate }) => {
               id="title"
               type="text"
               className="form-input"
-              placeholder="e.g. WiFi not working in Block B Hostel / Smart Board Issue"
+              placeholder={`e.g. WiFi issue in ${blockLocation} / Equipment problem`}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
-            {/* GCET Block Selector */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" htmlFor="blockSelect">
-                <MapPin size={16} color="#3b82f6" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                GCET Campus Location / Block <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <select
-                id="blockSelect"
-                className="form-input"
-                value={blockLocation}
-                onChange={(e) => setBlockLocation(e.target.value)}
-              >
-                {GCET_BLOCKS.map((blk) => (
-                  <option key={blk} value={blk}>{blk}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sub-category Selector */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" htmlFor="subCatSelect">
-                Sub-Category Issue <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <select
-                id="subCatSelect"
-                className="form-input"
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-              >
-                {(SUB_CATEGORIES[category] || ['General']).map((sub) => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
-            </div>
+          {/* Sub-category Selector */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="subCatSelect">
+              Sub-Category Issue <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <select
+              id="subCatSelect"
+              className="form-input"
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+            >
+              {(SUB_CATEGORIES[category] || ['General']).map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
           </div>
 
           {/* Category Pilling */}
@@ -204,7 +183,7 @@ const NewComplaintPage = ({ onNavigate }) => {
               id="description"
               className="form-textarea"
               rows={6}
-              placeholder="Describe what happened, room number/building location, specific dates, or relevant details..."
+              placeholder={`Describe what happened in ${blockLocation}, room number, specific details...`}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -214,7 +193,7 @@ const NewComplaintPage = ({ onNavigate }) => {
           <div style={{ background: '#f8fafc', padding: '1.1rem', borderRadius: '16px', marginBottom: '1.75rem', border: '1px solid #e2e8f0', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
             <HelpCircle size={20} color="#6366f1" style={{ flexShrink: 0, marginTop: '2px' }} />
             <p style={{ fontSize: '0.85rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
-              Submitted grievances are assigned a tracking code (<strong>GRV-YYYY-XXXX</strong>) and posted to <strong>Campus Feed</strong>. Other affected students can <strong>Upvote (+1)</strong> your issue to automatically escalate it to <strong>URGENT Priority</strong>!
+              Your grievance will be filed directly under <strong>{blockLocation}</strong>. Other affected students in this block can <strong>Upvote (+1)</strong> your issue to automatically escalate it to <strong>URGENT Priority</strong>!
             </p>
           </div>
 
@@ -232,7 +211,7 @@ const NewComplaintPage = ({ onNavigate }) => {
               disabled={loading}
             >
               <Send size={18} />
-              {loading ? 'Submitting...' : 'Submit Grievance'}
+              {loading ? 'Submitting...' : `Submit Grievance for ${blockLocation}`}
             </button>
           </div>
         </form>

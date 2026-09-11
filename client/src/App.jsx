@@ -30,6 +30,14 @@ const App = () => {
     return 'dashboard';
   });
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const [selectedBlockForForm, setSelectedBlockForForm] = useState('Block A');
+
+  const handleNavigate = (tab, payload) => {
+    if (payload) {
+      setSelectedBlockForForm(payload);
+    }
+    setActiveTab(tab);
+  };
 
   useEffect(() => {
     if (token) {
@@ -112,36 +120,36 @@ const App = () => {
 
         {/* Admin Navigation Views */}
         {isAdmin && activeTab === 'admin-dashboard' && (
-          <AdminDashboardPage user={user} onNavigate={setActiveTab} />
+          <AdminDashboardPage user={user} onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-complaints' && (
-          <AdminComplaintsPage onNavigate={setActiveTab} />
+          <AdminComplaintsPage onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-students' && (
-          <AdminStudentsPage onNavigate={setActiveTab} />
+          <AdminStudentsPage onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-analytics' && (
-          <AdminAnalyticsPage onNavigate={setActiveTab} />
+          <AdminAnalyticsPage onNavigate={handleNavigate} />
         )}
 
         {/* Student Navigation Views */}
         {!isAdmin && activeTab === 'dashboard' && (
-          <DashboardPage user={user} onNavigate={setActiveTab} />
+          <DashboardPage user={user} onNavigate={handleNavigate} />
         )}
 
         {!isAdmin && activeTab === 'campus-feed' && (
-          <CampusFeedPage onNavigate={setActiveTab} />
+          <CampusFeedPage onNavigate={handleNavigate} />
         )}
 
         {!isAdmin && activeTab === 'new-complaint' && (
-          <NewComplaintPage onNavigate={setActiveTab} />
+          <NewComplaintPage onNavigate={handleNavigate} selectedBlock={selectedBlockForForm} />
         )}
 
         {!isAdmin && activeTab === 'my-complaints' && (
-          <MyComplaintsPage onNavigate={setActiveTab} />
+          <MyComplaintsPage onNavigate={handleNavigate} />
         )}
 
         {/* Shared Profile View */}
