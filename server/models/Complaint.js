@@ -20,13 +20,27 @@ const complaintSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other']
+      enum: ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Other']
+    },
+    subCategory: {
+      type: String,
+      default: 'General'
+    },
+    blockLocation: {
+      type: String,
+      default: 'Other'
     },
     description: {
       type: String,
       required: true,
       trim: true
     },
+    upvotes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
     status: {
       type: String,
       enum: ['Pending', 'In Progress', 'Resolved', 'Rejected'],

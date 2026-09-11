@@ -8,7 +8,8 @@ import {
   GraduationCap,
   ShieldCheck,
   Users,
-  BarChart3
+  BarChart3,
+  Flame
 } from 'lucide-react';
 
 const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
@@ -16,6 +17,7 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
 
   const studentMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'campus-feed', label: 'Campus Feed 🔥', icon: Flame },
     { id: 'new-complaint', label: 'New Complaint', icon: PlusCircle },
     { id: 'my-complaints', label: 'My Complaints', icon: FileText },
     { id: 'profile', label: 'Profile', icon: User },

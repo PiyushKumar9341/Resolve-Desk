@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import CampusFeedPage from './pages/CampusFeedPage';
 import NewComplaintPage from './pages/NewComplaintPage';
 import MyComplaintsPage from './pages/MyComplaintsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -129,6 +130,10 @@ const App = () => {
         {/* Student Navigation Views */}
         {!isAdmin && activeTab === 'dashboard' && (
           <DashboardPage user={user} onNavigate={setActiveTab} />
+        )}
+
+        {!isAdmin && activeTab === 'campus-feed' && (
+          <CampusFeedPage onNavigate={setActiveTab} />
         )}
 
         {!isAdmin && activeTab === 'new-complaint' && (

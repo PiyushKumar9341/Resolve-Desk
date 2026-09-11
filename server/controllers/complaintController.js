@@ -13,13 +13,13 @@ function generateComplaintId() {
 // @access  Private (Student)
 const createComplaint = async (req, res) => {
   try {
-    const { title, category, description } = req.body;
+    const { title, category, subCategory, blockLocation, description } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({ message: 'Complaint title is required.' });
     }
 
-    const validCategories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const validCategories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Other'];
     if (!category || !validCategories.includes(category)) {
       return res.status(400).json({ message: 'Please select a valid complaint category.' });
     }
@@ -29,7 +29,6 @@ const createComplaint = async (req, res) => {
     }
 
     let complaintId = generateComplaintId();
-    // Ensure uniqueness
     let exists = await Complaint.findOne({ complaintId });
     while (exists) {
       complaintId = generateComplaintId();
@@ -41,11 +40,15 @@ const createComplaint = async (req, res) => {
       studentId: req.user._id,
       title: title.trim(),
       category,
+      subCategory: subCategory || 'General',
+      blockLocation: blockLocation || 'Other',
       description: description.trim(),
-      status: 'Pending'
+      status: 'Pending',
+      priority: 'Medium',
+      upvotes: []
     });
 
-    console.log(`[Complaint Created] ID: ${complaintId} by Student: ${req.user.email}`);
+    console.log(`[Complaint Created] ID: ${complaintId} by Student: ${req.user.email} (Block: ${blockLocation || 'Other'})`);
 
     return res.status(201).json({
       success: true,
@@ -55,6 +58,142 @@ const createComplaint = async (req, res) => {
   } catch (error) {
     console.error('[Create Complaint Error]', error);
     return res.status(500).json({ message: 'Server error while submitting complaint.' });
+  }
+};
+
+// @desc    Toggle upvote (+1 / Me Too) on a complaint & recalculate auto-priority
+// @route   POST /api/complaints/:id/upvote
+// @access  Private (Student & Admin)
+const toggleUpvote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const complaint = await Complaint.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint record not found.' });
+    }
+
+    if (!complaint.upvotes) {
+      complaint.upvotes = [];
+    }
+
+    const upvoteIndex = complaint.upvotes.findIndex(
+      (uid) => uid.toString() === userId.toString()
+    );
+
+    let hasUpvoted = false;
+    if (upvoteIndex > -1) {
+      complaint.upvotes.splice(upvoteIndex, 1);
+      hasUpvoted = false;
+    } else {
+      complaint.upvotes.push(userId);
+      hasUpvoted = true;
+    }
+
+    // Smart Auto-Priority Threshold Engine
+    const count = complaint.upvotes.length;
+    if (count >= 15) {
+      complaint.priority = 'Urgent';
+    } else if (count >= 5) {
+      complaint.priority = 'High';
+    } else if (complaint.priority === 'High' || complaint.priority === 'Urgent') {
+      complaint.priority = 'Medium';
+    }
+
+    await complaint.save();
+
+    return res.status(200).json({
+      success: true,
+      hasUpvoted,
+      upvoteCount: complaint.upvotes.length,
+      priority: complaint.priority,
+      message: hasUpvoted ? 'Upvoted successfully!' : 'Upvote removed.'
+    });
+  } catch (error) {
+    console.error('[Toggle Upvote Error]', error);
+    return res.status(500).json({ message: 'Server error while toggling upvote.' });
+  }
+};
+
+// @desc    Get all public campus complaints for Campus Feed
+// @route   GET /api/complaints/public
+// @access  Private (Student & Admin)
+const getPublicComplaints = async (req, res) => {
+  try {
+    const {
+      search = '',
+      category = 'All',
+      block = 'All',
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const query = {};
+
+    if (category && category !== 'All') {
+      query.category = category;
+    }
+
+    if (block && block !== 'All') {
+      query.blockLocation = block;
+    }
+
+    if (search && search.trim()) {
+      const term = search.trim();
+      query.$or = [
+        { complaintId: { $regex: term, $options: 'i' } },
+        { title: { $regex: term, $options: 'i' } },
+        { description: { $regex: term, $options: 'i' } },
+        { subCategory: { $regex: term, $options: 'i' } }
+      ];
+    }
+
+    const total = await Complaint.countDocuments(query);
+    const docs = await Complaint.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .populate('studentId', 'name email');
+
+    const formatted = docs.map((c) => {
+      const upvotesList = c.upvotes || [];
+      const hasUpvoted = req.user ? upvotesList.some(id => id.toString() === req.user._id.toString()) : false;
+
+      return {
+        _id: c._id,
+        complaintId: c.complaintId,
+        title: c.title,
+        category: c.category,
+        subCategory: c.subCategory || 'General',
+        blockLocation: c.blockLocation || 'Other',
+        description: c.description,
+        status: c.status,
+        priority: c.priority || 'Medium',
+        adminRemark: c.adminRemark || '',
+        createdAt: c.createdAt,
+        studentName: c.studentId?.name || 'Student',
+        studentEmail: c.studentId?.email || 'N/A',
+        upvoteCount: upvotesList.length,
+        hasUpvoted
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: formatted.length,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum) || 1,
+      complaints: formatted
+    });
+  } catch (error) {
+    console.error('[Get Public Complaints Error]', error);
+    return res.status(500).json({ message: 'Server error while fetching campus feed.' });
   }
 };
 
@@ -543,7 +682,9 @@ module.exports = {
   getAdminStats,
   getAllComplaintsAdmin,
   updateComplaintAdmin,
-  getAdminAnalytics
+  getAdminAnalytics,
+  toggleUpvote,
+  getPublicComplaints
 };
 
 

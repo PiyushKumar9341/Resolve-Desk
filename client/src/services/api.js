@@ -45,6 +45,16 @@ export const getStatsApi = async () => {
   return response.data;
 };
 
+export const getPublicComplaintsApi = async (params = {}) => {
+  const response = await api.get('/complaints/public', { params });
+  return response.data;
+};
+
+export const toggleUpvoteApi = async (id) => {
+  const response = await api.post(`/complaints/${id}/upvote`);
+  return response.data;
+};
+
 // Admin Complaint Services
 export const getAdminStatsApi = async () => {
   const response = await api.get('/complaints/admin/stats');
