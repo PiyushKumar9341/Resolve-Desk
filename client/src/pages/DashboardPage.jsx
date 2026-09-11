@@ -272,53 +272,72 @@ const DashboardPage = ({ user, onNavigate }) => {
           </div>
         </div>
 
-        {/* Loading Spinner */}
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem' }}>
-            <RefreshCw size={32} className="spin" color="#2563eb" style={{ margin: '0 auto 0.75rem auto' }} />
-            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Loading {selectedBlock} grievances...</p>
-          </div>
-        )}
+        {/* Feed Container with Fixed minHeight to prevent layout shifts */}
+        <div style={{ position: 'relative', minHeight: '350px' }}>
+          {/* Translucent Glass Loading Overlay (zero layout collapse / screen shake) */}
+          {loading && (
+            <div 
+              style={{ 
+                position: 'absolute', 
+                inset: 0, 
+                zIndex: 10, 
+                background: 'rgba(255, 255, 255, 0.65)', 
+                backdropFilter: 'blur(6px)', 
+                WebkitBackdropFilter: 'blur(6px)', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justify: 'center', 
+                borderRadius: '20px',
+                animation: 'alertFade 0.2s ease'
+              }}
+            >
+              <RefreshCw size={36} className="spin" color="#2563eb" style={{ marginBottom: '0.75rem' }} />
+              <p style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.92rem' }}>Updating {selectedBlock} grievances...</p>
+            </div>
+          )}
 
-        {/* Mode A: Block Feed */}
-        {!loading && activeTabMode === 'block-feed' && (
-          <>
-            {blockComplaints.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-                <Inbox size={44} color="#94a3b8" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.3rem' }}>
-                  No active grievances for {selectedBlock}
-                </h4>
-                <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
-                  Be the first student to raise an issue for {selectedBlock}.
-                </p>
-                <button className="btn btn-primary" onClick={() => onNavigate('new-complaint', selectedBlock)}>
-                  + Raise Complaint for {selectedBlock}
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
-                {blockComplaints.map((item) => {
-                  const isUrgent = item.priority === 'Urgent';
-                  const isHigh = item.priority === 'High';
+          {/* Mode A: Block Feed */}
+          {activeTabMode === 'block-feed' && (
+            <>
+              {!loading && blockComplaints.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'rgba(248, 250, 252, 0.6)', backdropFilter: 'blur(8px)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
+                  <Inbox size={44} color="#94a3b8" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.3rem' }}>
+                    No active grievances for {selectedBlock}
+                  </h4>
+                  <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+                    Be the first student to raise an issue for {selectedBlock}.
+                  </p>
+                  <button className="btn btn-primary" onClick={() => onNavigate('new-complaint', selectedBlock)}>
+                    + Raise Complaint for {selectedBlock}
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
+                  {blockComplaints.map((item) => {
+                    const isUrgent = item.priority === 'Urgent';
+                    const isHigh = item.priority === 'High';
 
-                  return (
-                    <div
-                      key={item._id}
-                      onClick={() => setSelectedComplaint(item)}
-                      style={{
-                        background: '#ffffff',
-                        border: isUrgent ? '1.5px solid #fca5a5' : isHigh ? '1.5px solid #fed7aa' : '1px solid #e2e8f0',
-                        borderRadius: '16px',
-                        padding: '1.25rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justify: 'space-between',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        boxShadow: isUrgent ? '0 8px 20px -4px rgba(239, 68, 68, 0.15)' : '0 4px 12px rgba(0,0,0,0.03)'
-                      }}
-                    >
+                    return (
+                      <div
+                        key={item._id}
+                        onClick={() => setSelectedComplaint(item)}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.7)',
+                          backdropFilter: 'blur(12px)',
+                          WebkitBackdropFilter: 'blur(12px)',
+                          border: isUrgent ? '1.5px solid #fca5a5' : isHigh ? '1.5px solid #fed7aa' : '1px solid rgba(255, 255, 255, 0.85)',
+                          borderRadius: '18px',
+                          padding: '1.25rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          cursor: 'pointer',
+                          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                          boxShadow: isUrgent ? '0 8px 20px -4px rgba(239, 68, 68, 0.15)' : '0 4px 15px rgba(0,0,0,0.03)'
+                        }}
+                      >
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                           <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
@@ -459,6 +478,7 @@ const DashboardPage = ({ user, onNavigate }) => {
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* On-Login / Location Switcher Popup Modal */}

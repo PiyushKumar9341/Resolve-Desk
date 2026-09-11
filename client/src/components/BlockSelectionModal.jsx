@@ -41,7 +41,7 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
           )}
         </div>
 
-        {/* Clean Block Selection Grid */}
+        {/* Translucent Frosted Glass Block Selection Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '1.75rem' }}>
           {GCET_BLOCKS.map((blk) => {
             const Icon = blk.icon;
@@ -59,15 +59,19 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
                   gap: '0.6rem',
                   padding: '0.85rem 1rem',
                   borderRadius: '14px',
-                  border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
-                  background: isSelected ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : '#ffffff',
-                  color: isSelected ? '#1e40af' : '#334155',
+                  border: isSelected ? '2px solid #2563eb' : '1px solid rgba(226, 232, 240, 0.8)',
+                  background: isSelected 
+                    ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.18) 0%, rgba(99, 102, 241, 0.22) 100%)' 
+                    : 'rgba(255, 255, 255, 0.55)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  color: isSelected ? '#1d4ed8' : '#334155',
                   fontWeight: isSelected ? 800 : 600,
                   fontSize: '0.88rem',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: isSelected ? '0 6px 16px rgba(37, 99, 235, 0.2)' : '0 2px 4px rgba(0,0,0,0.02)'
+                  boxShadow: isSelected ? '0 8px 20px rgba(37, 99, 235, 0.22)' : '0 2px 6px rgba(0,0,0,0.02)'
                 }}
               >
                 <Icon size={18} color={isSelected ? '#2563eb' : '#64748b'} />
