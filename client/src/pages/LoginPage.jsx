@@ -64,6 +64,20 @@ const LoginPage = ({ onLoginSuccess }) => {
     setLoading(true);
     try {
       const data = await verifyOtpApi(email, otp);
+
+      // Strict role enforcement check
+      if (roleMode === 'admin' && data.user?.role !== 'admin') {
+        setError('Access Denied: This account does not have administrator privileges. Please switch to Student Login.');
+        setLoading(false);
+        return;
+      }
+
+      if (roleMode === 'student' && data.user?.role === 'admin') {
+        setError('Administrator Account Detected: Please switch to the Admin Portal tab to log in.');
+        setLoading(false);
+        return;
+      }
+
       setSuccessMsg('Login successful. Welcome!');
       setTimeout(() => {
         onLoginSuccess(data.user, data.token);
