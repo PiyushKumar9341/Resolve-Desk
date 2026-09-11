@@ -1,42 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import StatsCard from '../components/StatsCard';
 import ComplaintModal from '../components/ComplaintModal';
+import BlockSelectionModal from '../components/BlockSelectionModal';
 import { getStatsApi, getMyComplaintsApi, getPublicComplaintsApi, toggleUpvoteApi } from '../services/api';
 import { 
   PlusCircle, 
   FileText, 
-  ArrowRight, 
   ShieldCheck, 
   Tag, 
   Calendar, 
   Flame, 
   MapPin, 
-  Building, 
-  Home, 
-  GraduationCap, 
-  Utensils, 
-  Sparkles, 
   Inbox, 
   RefreshCw,
-  UserCheck
+  UserCheck,
+  Edit3
 } from 'lucide-react';
-
-const GCET_BLOCKS = [
-  { id: 'Block A', label: 'Block A', subtitle: 'CS / IT / EC', icon: Building },
-  { id: 'Block B', label: 'Block B', subtitle: 'Mech / Civil / EE', icon: Building },
-  { id: 'Block C', label: 'Block C', subtitle: 'First Year / Applied', icon: Building },
-  { id: 'Block D', label: 'Block D', subtitle: 'Labs & Auditorium', icon: Building },
-  { id: 'GBS Block', label: 'GBS Block', subtitle: 'MBA & Business', icon: GraduationCap },
-  { id: 'Main Canteen / Food Court', label: 'Main Canteen', subtitle: 'Food Court & Dining', icon: Utensils },
-  { id: 'Hostel Block', label: 'Hostel Block', subtitle: 'Boys & Girls Hostel', icon: Home },
-  { id: 'Sports Complex / Ground', label: 'Sports Complex', subtitle: 'Ground & Gymnasium', icon: Sparkles },
-];
 
 const DashboardPage = ({ user, onNavigate }) => {
   const [stats, setStats] = useState({ total: 0, pending: 0, inProgress: 0, resolved: 0 });
-  const [selectedBlock, setSelectedBlock] = useState('Block A');
-  const [activeTabMode, setActiveTabMode] = useState('block-feed'); // 'block-feed' | 'my-complaints'
+  const [selectedBlock, setSelectedBlock] = useState(() => {
+    return localStorage.getItem('user_gcet_block') || 'Block A';
+  });
   
+  // Show popup modal if block has not been selected in current session
+  const [showBlockModal, setShowBlockModal] = useState(() => {
+    return !localStorage.getItem('user_gcet_block');
+  });
+
+  const [activeTabMode, setActiveTabMode] = useState('block-feed'); // 'block-feed' | 'my-complaints'
   const [blockComplaints, setBlockComplaints] = useState([]);
   const [myComplaints, setMyComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +46,11 @@ const DashboardPage = ({ user, onNavigate }) => {
       fetchMyComplaints();
     }
   }, [selectedBlock, activeTabMode]);
+
+  const handleSelectBlock = (newBlock) => {
+    setSelectedBlock(newBlock);
+    localStorage.setItem('user_gcet_block', newBlock);
+  };
 
   const fetchStats = async () => {
     try {
@@ -154,14 +151,40 @@ const DashboardPage = ({ user, onNavigate }) => {
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '0.75rem', border: '1px solid rgba(255,255,255,0.15)' }}>
               <ShieldCheck size={14} color="#60a5fa" />
-              <span>GCET Student Grievance Console &bull; Block Hub Active</span>
+              <span>GCET Student Grievance System</span>
             </div>
+
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
               Welcome, {getFirstName(user?.name)} 👋
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.92rem' }}>
-              Current Block Selected: <strong style={{ color: '#60a5fa' }}>{selectedBlock}</strong>
-            </p>
+
+            {/* Selected Location Pill */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.2rem' }}>
+              <span style={{ fontSize: '0.88rem', color: '#94a3b8' }}>
+                Active Location:
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowBlockModal(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  color: '#60a5fa',
+                  border: '1px solid rgba(96, 165, 250, 0.3)',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '20px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <MapPin size={14} color="#60a5fa" />
+                {selectedBlock}
+                <Edit3 size={12} style={{ marginLeft: '2px', opacity: 0.8 }} />
+              </button>
+            </div>
           </div>
 
           <button
@@ -178,67 +201,7 @@ const DashboardPage = ({ user, onNavigate }) => {
       {/* Stats Counter Section */}
       <StatsCard stats={stats} />
 
-      {/* GCET Campus Block Hub Selector */}
-      <div className="card" style={{ marginBottom: '1.75rem', padding: '1.25rem 1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <MapPin size={20} color="#2563eb" />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              GCET Campus Block Hub (Select Building)
-            </h3>
-          </div>
-          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
-            Click a block to view & upvote grievances
-          </span>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '0.75rem' }}>
-          {GCET_BLOCKS.map((blk) => {
-            const Icon = blk.icon;
-            const isSelected = selectedBlock === blk.id;
-
-            return (
-              <button
-                key={blk.id}
-                type="button"
-                onClick={() => setSelectedBlock(blk.id)}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  padding: '0.85rem 1rem',
-                  borderRadius: '16px',
-                  border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
-                  background: isSelected
-                    ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'
-                    : '#ffffff',
-                  boxShadow: isSelected ? '0 4px 14px rgba(37, 99, 235, 0.2)' : 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '0.4rem' }}>
-                  <Icon size={20} color={isSelected ? '#2563eb' : '#64748b'} />
-                  {isSelected && (
-                    <span style={{ fontSize: '0.65rem', fontWeight: 800, background: '#2563eb', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '6px' }}>
-                      ACTIVE
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: isSelected ? '#1e3a8a' : '#1e293b' }}>
-                  {blk.label}
-                </div>
-                <div style={{ fontSize: '0.72rem', color: isSelected ? '#2563eb' : '#94a3b8', fontWeight: 600 }}>
-                  {blk.subtitle}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Main Unified Grievance Section */}
+      {/* Main Grievance Hub Section */}
       <div className="card">
         {/* Mode Tabs */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
@@ -262,7 +225,7 @@ const DashboardPage = ({ user, onNavigate }) => {
               }}
             >
               <Flame size={16} color={activeTabMode === 'block-feed' ? '#f97316' : '#64748b'} />
-              {selectedBlock} Feed 🔥
+              {selectedBlock} Grievances 🔥
             </button>
 
             <button
@@ -288,13 +251,25 @@ const DashboardPage = ({ user, onNavigate }) => {
             </button>
           </div>
 
-          <button
-            className="btn btn-secondary"
-            onClick={() => onNavigate('new-complaint', selectedBlock)}
-            style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
-          >
-            + New Complaint ({selectedBlock})
-          </button>
+          <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowBlockModal(true)}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+            >
+              <MapPin size={14} color="#3b82f6" />
+              Switch Block ({selectedBlock})
+            </button>
+
+            <button
+              className="btn btn-primary"
+              onClick={() => onNavigate('new-complaint', selectedBlock)}
+              style={{ fontSize: '0.85rem', padding: '0.45rem 1rem' }}
+            >
+              + New Complaint
+            </button>
+          </div>
         </div>
 
         {/* Loading Spinner */}
@@ -482,6 +457,15 @@ const DashboardPage = ({ user, onNavigate }) => {
           </>
         )}
       </div>
+
+      {/* On-Login / Location Switcher Popup Modal */}
+      {showBlockModal && (
+        <BlockSelectionModal
+          selectedBlock={selectedBlock}
+          onSelectBlock={handleSelectBlock}
+          onClose={() => setShowBlockModal(false)}
+        />
+      )}
 
       {/* Modal for viewing complaint details */}
       {selectedComplaint && (
