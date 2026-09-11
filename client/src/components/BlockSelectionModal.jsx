@@ -15,9 +15,9 @@ const GCET_BLOCKS = [
 
 const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
   return (
-    <div className="modal-overlay" style={{ background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', zIndex: 100 }}>
-      <div className="modal-content" style={{ maxWidth: '540px', borderRadius: '24px', padding: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ maxWidth: '540px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(226, 232, 240, 0.6)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <div style={{ width: '40px', height: '40px', background: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
               <MapPin size={22} />
