@@ -14,7 +14,7 @@ const SUB_CATEGORIES = {
   Hostel: ['Wi-Fi & Network', 'Plumbing & Water', 'Electricity & Fan/AC', 'Cleanliness & Hygiene', 'Furniture & Bed'],
   Academic: ['Classroom Smart Board/Projector', 'Lab Equipment & Computers', 'Department Equipment', 'General Academic Facility'],
   Infrastructure: ['Lift & Elevator', 'Washroom & Hygiene', 'Air Conditioning', 'Lighting & Electrical'],
-  'Canteen & Mess': ['Food Quality & Hygiene', 'Overcharging / Pricing', 'Seating & Cleanliness', 'Billing & Queue'],
+  'Canteen & Mess': ['Food Quality & Hygiene', 'Seating & Cleanliness', 'General Canteen/Mess Facility'],
   Other: ['General Campus Concern', 'Other']
 };
 
