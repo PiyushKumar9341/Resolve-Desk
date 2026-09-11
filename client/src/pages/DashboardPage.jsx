@@ -134,14 +134,19 @@ const DashboardPage = ({ user, onNavigate }) => {
     });
   };
 
+  const handleStatCardClick = (statusFilter) => {
+    onNavigate('my-complaints', selectedBlock, statusFilter);
+  };
+
   return (
     <div className="page-content">
       {/* Welcome Banner */}
       <div 
         className="card" 
         style={{ 
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)', 
-          color: 'white', 
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)', 
+          border: '1px solid var(--border-glass)',
+          boxShadow: 'var(--shadow-lg)',
           marginBottom: '1.75rem',
           position: 'relative',
           overflow: 'hidden'
@@ -149,13 +154,13 @@ const DashboardPage = ({ user, onNavigate }) => {
       >
         <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '0.75rem', border: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '0.75rem', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff' }}>
               <ShieldCheck size={14} color="#60a5fa" />
-              <span>GCET Student Grievance System</span>
+              <span style={{ color: '#ffffff', fontWeight: 600 }}>GCET Student Grievance System</span>
             </div>
 
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
-              Welcome, {getFirstName(user?.name)} 👋
+              Welcome, <span className="text-gradient-hero">{getFirstName(user?.name)}</span> 👋
             </h2>
 
             {/* Selected Location Pill */}
@@ -170,12 +175,12 @@ const DashboardPage = ({ user, onNavigate }) => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.4rem',
-                  background: 'rgba(59, 130, 246, 0.2)',
-                  color: '#60a5fa',
-                  border: '1px solid rgba(96, 165, 250, 0.3)',
-                  padding: '0.25rem 0.75rem',
+                  padding: '0.35rem 0.85rem',
                   borderRadius: '20px',
-                  fontSize: '0.85rem',
+                  background: 'rgba(99, 102, 241, 0.2)',
+                  border: '1px solid rgba(99, 102, 241, 0.4)',
+                  color: '#818cf8',
+                  fontSize: '0.88rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
@@ -199,13 +204,13 @@ const DashboardPage = ({ user, onNavigate }) => {
       </div>
 
       {/* Stats Counter Section */}
-      <StatsCard stats={stats} />
+      <StatsCard stats={stats} onStatClick={handleStatCardClick} />
 
       {/* Main Grievance Hub Section */}
       <div className="card">
         {/* Mode Tabs */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', background: '#f1f5f9', padding: '4px', borderRadius: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-subtle)', padding: '4px', borderRadius: '14px', border: '1px solid var(--border)' }}>
             <button
               type="button"
               onClick={() => setActiveTabMode('block-feed')}
@@ -219,12 +224,13 @@ const DashboardPage = ({ user, onNavigate }) => {
                 fontSize: '0.88rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: activeTabMode === 'block-feed' ? '#ffffff' : 'transparent',
-                color: activeTabMode === 'block-feed' ? '#2563eb' : '#64748b',
-                boxShadow: activeTabMode === 'block-feed' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none'
+                background: activeTabMode === 'block-feed' ? 'var(--surface-raised)' : 'transparent',
+                color: activeTabMode === 'block-feed' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: activeTabMode === 'block-feed' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.25s ease'
               }}
             >
-              <Flame size={16} color={activeTabMode === 'block-feed' ? '#f97316' : '#64748b'} />
+              <Flame size={16} color={activeTabMode === 'block-feed' ? '#f97316' : 'var(--text-muted)'} />
               {selectedBlock} Grievances 🔥
             </button>
 
@@ -241,9 +247,10 @@ const DashboardPage = ({ user, onNavigate }) => {
                 fontSize: '0.88rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: activeTabMode === 'my-complaints' ? '#ffffff' : 'transparent',
-                color: activeTabMode === 'my-complaints' ? '#2563eb' : '#64748b',
-                boxShadow: activeTabMode === 'my-complaints' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none'
+                background: activeTabMode === 'my-complaints' ? 'var(--surface-raised)' : 'transparent',
+                color: activeTabMode === 'my-complaints' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: activeTabMode === 'my-complaints' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.25s ease'
               }}
             >
               <UserCheck size={16} />
@@ -274,26 +281,26 @@ const DashboardPage = ({ user, onNavigate }) => {
 
         {/* Feed Container with Fixed minHeight to prevent layout shifts */}
         <div style={{ position: 'relative', minHeight: '350px' }}>
-          {/* Translucent Glass Loading Overlay (zero layout collapse / screen shake) */}
+          {/* Translucent Glass Loading Overlay */}
           {loading && (
             <div 
               style={{ 
                 position: 'absolute', 
                 inset: 0, 
                 zIndex: 10, 
-                background: 'rgba(255, 255, 255, 0.65)', 
-                backdropFilter: 'blur(6px)', 
-                WebkitBackdropFilter: 'blur(6px)', 
+                background: 'var(--surface-glass)', 
+                backdropFilter: 'blur(8px)', 
+                WebkitBackdropFilter: 'blur(8px)', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'center', 
-                justify: 'center', 
+                justifyContent: 'center', 
                 borderRadius: '20px',
                 animation: 'alertFade 0.2s ease'
               }}
             >
-              <RefreshCw size={36} className="spin" color="#2563eb" style={{ marginBottom: '0.75rem' }} />
-              <p style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.92rem' }}>Updating {selectedBlock} grievances...</p>
+              <RefreshCw size={36} className="spin" color="var(--primary)" style={{ marginBottom: '0.75rem' }} />
+              <p style={{ color: 'var(--text-main)', fontWeight: 700, fontSize: '0.92rem' }}>Updating {selectedBlock} grievances...</p>
             </div>
           )}
 
@@ -301,12 +308,12 @@ const DashboardPage = ({ user, onNavigate }) => {
           {activeTabMode === 'block-feed' && (
             <>
               {!loading && blockComplaints.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'rgba(248, 250, 252, 0.6)', backdropFilter: 'blur(8px)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-                  <Inbox size={44} color="#94a3b8" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
-                  <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.3rem' }}>
+                <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-subtle)', backdropFilter: 'blur(8px)', borderRadius: '16px', border: '1px dashed var(--border)' }}>
+                  <Inbox size={44} color="var(--text-muted)" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
                     No active grievances for {selectedBlock}
                   </h4>
-                  <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
                     Be the first student to raise an issue for {selectedBlock}.
                   </p>
                   <button className="btn btn-primary" onClick={() => onNavigate('new-complaint', selectedBlock)}>
@@ -324,10 +331,10 @@ const DashboardPage = ({ user, onNavigate }) => {
                         key={item._id}
                         onClick={() => setSelectedComplaint(item)}
                         style={{
-                          background: 'rgba(255, 255, 255, 0.7)',
+                          background: 'var(--card-bg)',
                           backdropFilter: 'blur(12px)',
                           WebkitBackdropFilter: 'blur(12px)',
-                          border: isUrgent ? '1.5px solid #fca5a5' : isHigh ? '1.5px solid #fed7aa' : '1px solid rgba(255, 255, 255, 0.85)',
+                          border: isUrgent ? '1.5px solid #fca5a5' : isHigh ? '1.5px solid #fed7aa' : '1px solid var(--border)',
                           borderRadius: '18px',
                           padding: '1.25rem',
                           display: 'flex',
@@ -335,12 +342,12 @@ const DashboardPage = ({ user, onNavigate }) => {
                           justifyContent: 'space-between',
                           cursor: 'pointer',
                           transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                          boxShadow: isUrgent ? '0 8px 20px -4px rgba(239, 68, 68, 0.15)' : '0 4px 15px rgba(0,0,0,0.03)'
+                          boxShadow: isUrgent ? '0 8px 20px -4px rgba(239, 68, 68, 0.2)' : 'var(--card-shadow)'
                         }}
                       >
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                          <span style={{ background: '#eff6ff', color: '#2563eb', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                          <span style={{ background: 'var(--primary-soft)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border-accent)' }}>
                             {item.complaintId}
                           </span>
                           <span className={`badge ${item.status.replace(' ', '-')}`}>
@@ -348,35 +355,35 @@ const DashboardPage = ({ user, onNavigate }) => {
                           </span>
                         </div>
 
-                        <h4 style={{ fontSize: '1.02rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem', lineHeight: 1.35 }}>
+                        <h4 style={{ fontSize: '1.02rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.35rem', lineHeight: 1.35 }}>
                           {item.title}
                         </h4>
 
-                        <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <Tag size={13} color="#8b5cf6" />
-                          <span>{item.category} &bull; <strong style={{ color: '#475569' }}>{item.subCategory}</strong></span>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Tag size={13} color="var(--primary)" />
+                          <span>{item.category} &bull; <strong style={{ color: 'var(--text-subtle)' }}>{item.subCategory}</strong></span>
                         </div>
 
-                        <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.45, marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                           {item.description}
                         </p>
                       </div>
 
                       <div>
                         {isUrgent && (
-                          <div style={{ background: '#fef2f2', color: '#dc2626', padding: '0.35rem 0.65rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '0.35rem 0.65rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                             <Flame size={13} color="#ef4444" /> AUTO-URGENT 🚨 ({item.upvoteCount}+ Upvotes)
                           </div>
                         )}
 
                         {isHigh && (
-                          <div style={{ background: '#fff7ed', color: '#c2410c', padding: '0.35rem 0.65rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <div style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#f97316', padding: '0.35rem 0.65rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem', border: '1px solid rgba(249, 115, 22, 0.3)' }}>
                             <Flame size={13} color="#f97316" /> HIGH PRIORITY 🔥 ({item.upvoteCount} Upvotes)
                           </div>
                         )}
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid #f1f5f9' }}>
-                          <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                             <Calendar size={12} /> {formatDate(item.createdAt)}
                           </span>
 
@@ -393,17 +400,17 @@ const DashboardPage = ({ user, onNavigate }) => {
                               borderRadius: '20px',
                               fontSize: '0.78rem',
                               fontWeight: 700,
-                              border: 'none',
+                              border: '1px solid var(--border)',
                               cursor: 'pointer',
-                              background: item.hasUpvoted ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : '#f1f5f9',
-                              color: item.hasUpvoted ? '#ffffff' : '#334155',
+                              background: item.hasUpvoted ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'var(--bg-subtle)',
+                              color: item.hasUpvoted ? '#ffffff' : 'var(--text-main)',
                               boxShadow: item.hasUpvoted ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none',
                               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
                             }}
                           >
                             <Flame size={13} color={item.hasUpvoted ? '#ffffff' : '#f97316'} />
                             <span>{item.hasUpvoted ? 'Upvoted' : '+1 Upvote'}</span>
-                            <span style={{ background: item.hasUpvoted ? 'rgba(255,255,255,0.25)' : '#e2e8f0', padding: '0.05rem 0.4rem', borderRadius: '10px', fontSize: '0.75rem' }}>
+                            <span style={{ background: item.hasUpvoted ? 'rgba(255,255,255,0.25)' : 'var(--surface-raised)', padding: '0.05rem 0.4rem', borderRadius: '10px', fontSize: '0.75rem', color: item.hasUpvoted ? '#ffffff' : 'var(--text-main)' }}>
                               {item.upvoteCount}
                             </span>
                           </button>
@@ -421,9 +428,9 @@ const DashboardPage = ({ user, onNavigate }) => {
         {!loading && activeTabMode === 'my-complaints' && (
           <>
             {myComplaints.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-                <FileText size={44} color="#94a3b8" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+              <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-subtle)', borderRadius: '16px', border: '1px dashed var(--border)' }}>
+                <FileText size={44} color="var(--text-muted)" style={{ marginBottom: '0.75rem', opacity: 0.7 }} />
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
                   No personal complaints submitted yet.
                 </h4>
                 <button className="btn btn-primary" onClick={() => onNavigate('new-complaint', selectedBlock)} style={{ marginTop: '0.75rem' }}>
@@ -447,22 +454,22 @@ const DashboardPage = ({ user, onNavigate }) => {
                     {myComplaints.map((item) => (
                       <tr key={item._id} onClick={() => setSelectedComplaint(item)}>
                         <td>
-                          <strong style={{ color: '#2563eb', fontFamily: 'monospace' }}>{item.complaintId}</strong>
+                          <strong style={{ color: 'var(--primary)', fontFamily: 'monospace' }}>{item.complaintId}</strong>
                         </td>
                         <td>
-                          <span style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.85rem' }}>
+                          <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.85rem' }}>
                             {item.blockLocation || 'Block A'}
                           </span>
                         </td>
                         <td>
-                          <strong style={{ color: '#1e293b' }}>{item.title}</strong>
+                          <strong style={{ color: 'var(--text-main)' }}>{item.title}</strong>
                         </td>
                         <td>
-                          <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                             {item.category}
                           </span>
                         </td>
-                        <td style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                           {formatDate(item.createdAt)}
                         </td>
                         <td>

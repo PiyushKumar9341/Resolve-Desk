@@ -4,7 +4,6 @@ import {
   PlusCircle, 
   FileText, 
   User, 
-  LogOut, 
   GraduationCap,
   ShieldCheck,
   Users,
@@ -51,12 +50,12 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout, mobileMenuOpen, setM
 
       <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <div className="brand-icon" style={isAdmin ? { background: 'linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)' } : {}}>
+          <div className="brand-icon" style={isAdmin ? { background: 'linear-gradient(135deg, var(--brand-blue) 0%, var(--primary-dark) 100%)' } : { background: 'linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-teal) 100%)' }}>
             {isAdmin ? <ShieldCheck size={24} /> : <GraduationCap size={24} />}
           </div>
           <div style={{ flex: 1 }}>
             <div className="brand-title">{isAdmin ? 'Admin Console' : 'Student Portal'}</div>
-            <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
               {isAdmin ? 'Authority Portal' : 'Grievance Portal'}
             </div>
           </div>
@@ -66,7 +65,7 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout, mobileMenuOpen, setM
               onClick={() => setMobileMenuOpen(false)}
               aria-label="Close Menu"
             >
-              <X size={20} color="#64748b" />
+              <X size={20} color="var(--text-muted)" />
             </button>
           )}
         </div>
@@ -87,13 +86,6 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout, mobileMenuOpen, setM
             );
           })}
         </nav>
-
-        <div className="sidebar-footer">
-          <button className="logout-btn" onClick={() => { if (setMobileMenuOpen) setMobileMenuOpen(false); onLogout(); }}>
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
-        </div>
       </aside>
     </>
   );

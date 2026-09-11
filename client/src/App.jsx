@@ -29,13 +29,15 @@ const App = () => {
     return 'dashboard';
   });
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const [initialStatusFilter, setInitialStatusFilter] = useState('All');
   const [selectedBlockForForm, setSelectedBlockForForm] = useState('Block A');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavigate = (tab, payload) => {
+  const handleNavigate = (tab, payload, statusFilter = 'All') => {
     if (payload) {
       setSelectedBlockForForm(payload);
     }
+    setInitialStatusFilter(statusFilter || 'All');
     setActiveTab(tab);
     setMobileMenuOpen(false);
   };
@@ -109,20 +111,15 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <Sidebar
-        user={user}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={handleLogout}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-      />
-
       <div className="main-wrapper">
         <Navbar 
           user={user} 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
           mobileMenuOpen={mobileMenuOpen}
           setMobileMenuOpen={setMobileMenuOpen}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
         />
 
         {/* Admin Navigation Views */}
@@ -152,7 +149,7 @@ const App = () => {
         )}
 
         {!isAdmin && activeTab === 'my-complaints' && (
-          <MyComplaintsPage onNavigate={handleNavigate} />
+          <MyComplaintsPage onNavigate={handleNavigate} initialStatusFilter={initialStatusFilter} />
         )}
 
         {/* Shared Profile View */}

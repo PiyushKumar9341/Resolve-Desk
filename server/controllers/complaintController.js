@@ -1,5 +1,6 @@
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
+const { createNotificationHelper } = require('./notificationController');
 
 // Helper to generate readable custom complaint ID (e.g. GRV-2026-4829)
 function generateComplaintId() {
@@ -19,7 +20,7 @@ const createComplaint = async (req, res) => {
       return res.status(400).json({ message: 'Complaint title is required.' });
     }
 
-    const validCategories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Other'];
+    const validCategories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     if (!category || !validCategories.includes(category)) {
       return res.status(400).json({ message: 'Please select a valid complaint category.' });
     }
@@ -49,6 +50,15 @@ const createComplaint = async (req, res) => {
     });
 
     console.log(`[Complaint Created] ID: ${complaintId} by Student: ${req.user.email} (Block: ${blockLocation || 'Other'})`);
+
+    // Trigger notification to student
+    await createNotificationHelper({
+      recipient: req.user._id,
+      complaint: complaint._id,
+      title: `Grievance Logged #${complaintId}`,
+      message: `Your complaint "${title.trim()}" has been recorded under ${category}.`,
+      type: 'new_complaint'
+    });
 
     return res.status(201).json({
       success: true,
@@ -102,6 +112,18 @@ const toggleUpvote = async (req, res) => {
     }
 
     await complaint.save();
+
+    // Trigger notification to complaint author if upvoted by someone else
+    if (hasUpvoted && complaint.studentId && complaint.studentId.toString() !== userId.toString()) {
+      await createNotificationHelper({
+        recipient: complaint.studentId,
+        sender: userId,
+        complaint: complaint._id,
+        title: 'New Upvote Support 👍',
+        message: `A fellow student upvoted your grievance "${complaint.title}". Total support: ${complaint.upvotes.length}.`,
+        type: 'upvote'
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -264,7 +286,7 @@ const getAdminStats = async (req, res) => {
       { $group: { _id: '$category', count: { $sum: 1 } } }
     ]);
 
-    const categories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const categories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     const categoryCounts = categories.map(cat => {
       const match = categoryStats.find(c => c._id === cat);
       return { category: cat, count: match ? match.count : 0 };
@@ -506,6 +528,9 @@ const updateComplaintAdmin = async (req, res) => {
       });
     }
 
+    const oldStatus = complaint.status;
+    const oldRemark = complaint.adminRemark;
+
     // Update status and append to statusHistory if status changed
     if (status && status !== complaint.status) {
       complaint.status = status;
@@ -528,6 +553,29 @@ const updateComplaintAdmin = async (req, res) => {
     if (assignedStaff !== undefined) complaint.assignedStaff = assignedStaff;
 
     await complaint.save();
+
+    // Trigger Notification to Student
+    if (complaint.studentId) {
+      if (status && status !== oldStatus) {
+        await createNotificationHelper({
+          recipient: complaint.studentId,
+          sender: req.user._id,
+          complaint: complaint._id,
+          title: `Status Updated to '${status}'`,
+          message: `Your grievance #${complaint.complaintId} status was changed to ${status}.${adminRemark ? ` Remark: "${adminRemark}"` : ''}`,
+          type: 'status_change'
+        });
+      } else if (adminRemark && adminRemark !== oldRemark) {
+        await createNotificationHelper({
+          recipient: complaint.studentId,
+          sender: req.user._id,
+          complaint: complaint._id,
+          title: 'New Admin Remark Added',
+          message: `Grievance Cell added a remark on #${complaint.complaintId}: "${adminRemark}"`,
+          type: 'remark'
+        });
+      }
+    }
 
     // Re-fetch with populated student and statusHistory changedBy details
     const updatedDoc = await Complaint.findById(complaint._id)
@@ -602,7 +650,7 @@ const getAdminAnalytics = async (req, res) => {
     });
 
     // Category Distribution & Category Resolution Rates
-    const categories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const categories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     const categoryAnalytics = await Promise.all(
       categories.map(async (cat) => {
         const total = await Complaint.countDocuments({ category: cat });

@@ -103,4 +103,25 @@ export const updateProfileApi = async (name) => {
   return response.data;
 };
 
+// Notification Services
+export const getNotificationsApi = async () => {
+  const response = await api.get('/notifications');
+  return response.data;
+};
+
+export const markNotificationReadApi = async (id) => {
+  const response = await api.put(`/notifications/${id}/read`);
+  return response.data;
+};
+
+export const markAllNotificationsReadApi = async () => {
+  const response = await api.put('/notifications/read-all');
+  return response.data;
+};
+
+export const deleteNotificationApi = async (id) => {
+  const response = await api.delete(`/notifications/${id}`);
+  return response.data;
+};
+
 export default api;

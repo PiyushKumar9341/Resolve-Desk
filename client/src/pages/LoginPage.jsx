@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { sendOtpApi, verifyOtpApi } from '../services/api';
-import { GraduationCap, Mail, KeyRound, ArrowRight, RefreshCw, CheckCircle2, AlertCircle, Sparkles, Shield, Clock, CheckCircle, ShieldCheck } from 'lucide-react';
+import { GraduationCap, Mail, KeyRound, ArrowRight, RefreshCw, CheckCircle2, AlertCircle, Sparkles, Shield, Clock, CheckCircle, ShieldCheck, Sun, Moon } from 'lucide-react';
 
 const LoginPage = ({ onLoginSuccess }) => {
   const [roleMode, setRoleMode] = useState('student'); // 'student' | 'admin'
@@ -23,6 +23,19 @@ const LoginPage = ({ onLoginSuccess }) => {
     }
     return () => clearInterval(timer);
   }, [cooldown]);
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('skillnexis-theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('skillnexis-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -115,7 +128,34 @@ const LoginPage = ({ onLoginSuccess }) => {
       <div className="blob blob-2"></div>
       <div className="blob blob-3"></div>
 
-      <div className="login-card">
+      <div className="login-card" style={{ position: 'relative' }}>
+        {/* Top-Right Theme Toggle (Sun/Moon) */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          style={{
+            position: 'absolute',
+            top: '1.25rem',
+            right: '1.25rem',
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            border: '1px solid var(--border)',
+            background: 'var(--bg-subtle)',
+            color: 'var(--text-main)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 10,
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+          }}
+        >
+          {theme === 'dark' ? <Sun size={18} color="#f59e0b" /> : <Moon size={18} color="#6366f1" />}
+        </button>
+
         {/* Water-Ripple Role Switcher */}
         <div className="role-switch-wrapper">
           <div className="role-switch-container">
@@ -147,35 +187,29 @@ const LoginPage = ({ onLoginSuccess }) => {
           </div>
         </div>
 
-        {/* Step dots */}
-        <div className="step-indicator">
-          <div className={`step-dot ${step === 1 ? 'active' : 'inactive'}`}></div>
-          <div className={`step-dot ${step === 2 ? 'active' : 'inactive'}`}></div>
-        </div>
-
-        <div className="login-header">
-          <div className={`logo-badge ${roleMode === 'admin' ? 'admin-theme' : ''}`}>
-            {roleMode === 'admin' ? <ShieldCheck size={36} /> : <GraduationCap size={36} />}
+        <div className="login-header" style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+          <div className={`logo-badge ${roleMode === 'admin' ? 'admin-theme' : ''}`} style={{ width: '60px', height: '60px', margin: '0 auto 1rem auto' }}>
+            {roleMode === 'admin' ? <ShieldCheck size={32} /> : <GraduationCap size={32} />}
           </div>
-          <h1 className="login-title">
-            {roleMode === 'admin' ? 'Administrator Control Panel' : 'Student Grievance Portal'}
+          <h1 className="login-title" style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.35rem' }}>
+            {roleMode === 'admin' ? 'Galgotias Admin Portal' : 'Galgotias Student Portal'}
           </h1>
-          <p className="login-subtitle">
+          <p className="login-subtitle" style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
             {roleMode === 'admin'
-              ? 'Manage grievances, review student requests & analytics.'
-              : 'Raise your concern. Track the resolution in real-time.'}
+              ? 'Institutional Grievance Governance System'
+              : 'Official Student Grievance Portal'}
           </p>
         </div>
 
         {error && (
-          <div className="alert alert-error">
+          <div className="alert alert-error" style={{ marginBottom: '1rem' }}>
             <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
             <span>{error}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="alert alert-success">
+          <div className="alert alert-success" style={{ marginBottom: '1rem' }}>
             <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
             <span>{successMsg}</span>
           </div>
@@ -183,9 +217,9 @@ const LoginPage = ({ onLoginSuccess }) => {
 
         {step === 1 ? (
           <form onSubmit={handleSendOtp}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="emailInput">
-                {roleMode === 'admin' ? 'Administrator Email' : 'Student Email Address'}
+            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+              <label className="form-label" htmlFor="emailInput" style={{ fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.45rem', display: 'block' }}>
+                {roleMode === 'admin' ? 'Administrator Email' : 'Institutional Email Address'}
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail 
@@ -198,7 +232,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                   type="email"
                   className="form-input"
                   style={{ paddingLeft: '2.75rem' }}
-                  placeholder={roleMode === 'admin' ? 'admin@college.edu' : 'student@gmail.com'}
+                  placeholder={roleMode === 'admin' ? 'admin@galgotiacollege.edu' : 'student.id@galgotiacollege.edu'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -210,7 +244,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             <button
               type="submit"
               className={`btn btn-primary ${roleMode === 'admin' ? 'admin-btn' : ''}`}
-              style={{ width: '100%', marginTop: '0.85rem' }}
+              style={{ width: '100%', marginTop: '0.5rem' }}
               disabled={loading}
             >
               {loading ? (
@@ -228,9 +262,9 @@ const LoginPage = ({ onLoginSuccess }) => {
           </form>
         ) : (
           <form onSubmit={handleVerifyOtp}>
-            <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '14px', marginBottom: '1.35rem', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.88rem', color: '#475569', fontWeight: 500 }}>
-                Sent to: <strong style={{ color: '#0f172a' }}>{email}</strong>
+            <div style={{ background: 'var(--bg-subtle)', padding: '0.85rem 1rem', borderRadius: '14px', marginBottom: '1.35rem', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.88rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                Sent to: <strong style={{ color: 'var(--text-main)' }}>{email}</strong>
               </span>
               <button
                 type="button"
@@ -313,7 +347,7 @@ const LoginPage = ({ onLoginSuccess }) => {
         )}
 
         {/* Feature Badges */}
-        <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '1.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
             <Shield size={14} color="#3b82f6" /> Encrypted Auth
           </span>
