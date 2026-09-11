@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { sendOtpApi, verifyOtpApi } from '../services/api';
-import { GraduationCap, Mail, KeyRound, ArrowRight, RefreshCw, CheckCircle2, AlertCircle, Sparkles, Shield, Clock, CheckCircle } from 'lucide-react';
+import { GraduationCap, Mail, KeyRound, ArrowRight, RefreshCw, CheckCircle2, AlertCircle, Sparkles, Shield, Clock, CheckCircle, ShieldCheck } from 'lucide-react';
 
 const LoginPage = ({ onLoginSuccess }) => {
+  const [roleMode, setRoleMode] = useState('student'); // 'student' | 'admin'
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1); // 1 = Enter Email, 2 = Enter OTP
@@ -101,6 +102,37 @@ const LoginPage = ({ onLoginSuccess }) => {
       <div className="blob blob-3"></div>
 
       <div className="login-card">
+        {/* Water-Ripple Role Switcher */}
+        <div className="role-switch-wrapper">
+          <div className="role-switch-container">
+            <div className={`role-switch-pill ${roleMode}`} />
+            <button
+              type="button"
+              className={`role-switch-btn ${roleMode === 'student' ? 'active' : ''}`}
+              onClick={() => {
+                setRoleMode('student');
+                setError('');
+                setSuccessMsg('');
+              }}
+            >
+              <GraduationCap size={16} />
+              Student Login
+            </button>
+            <button
+              type="button"
+              className={`role-switch-btn ${roleMode === 'admin' ? 'active' : ''}`}
+              onClick={() => {
+                setRoleMode('admin');
+                setError('');
+                setSuccessMsg('');
+              }}
+            >
+              <ShieldCheck size={16} />
+              Admin Portal
+            </button>
+          </div>
+        </div>
+
         {/* Step dots */}
         <div className="step-indicator">
           <div className={`step-dot ${step === 1 ? 'active' : 'inactive'}`}></div>
@@ -108,11 +140,17 @@ const LoginPage = ({ onLoginSuccess }) => {
         </div>
 
         <div className="login-header">
-          <div className="logo-badge">
-            <GraduationCap size={36} />
+          <div className={`logo-badge ${roleMode === 'admin' ? 'admin-theme' : ''}`}>
+            {roleMode === 'admin' ? <ShieldCheck size={36} /> : <GraduationCap size={36} />}
           </div>
-          <h1 className="login-title">Student Grievance Portal</h1>
-          <p className="login-subtitle">Raise your concern. Track the resolution in real-time.</p>
+          <h1 className="login-title">
+            {roleMode === 'admin' ? 'Administrator Control Panel' : 'Student Grievance Portal'}
+          </h1>
+          <p className="login-subtitle">
+            {roleMode === 'admin'
+              ? 'Manage grievances, review student requests & analytics.'
+              : 'Raise your concern. Track the resolution in real-time.'}
+          </p>
         </div>
 
         {error && (
@@ -133,7 +171,7 @@ const LoginPage = ({ onLoginSuccess }) => {
           <form onSubmit={handleSendOtp}>
             <div className="form-group">
               <label className="form-label" htmlFor="emailInput">
-                Email Address
+                {roleMode === 'admin' ? 'Administrator Email' : 'Student Email Address'}
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail 
@@ -146,7 +184,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                   type="email"
                   className="form-input"
                   style={{ paddingLeft: '2.75rem' }}
-                  placeholder="xyz@gmail.com"
+                  placeholder={roleMode === 'admin' ? 'admin@college.edu' : 'student@gmail.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -157,7 +195,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
             <button
               type="submit"
-              className="btn btn-primary"
+              className={`btn btn-primary ${roleMode === 'admin' ? 'admin-btn' : ''}`}
               style={{ width: '100%', marginTop: '0.85rem' }}
               disabled={loading}
             >
@@ -216,7 +254,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
             <button
               type="submit"
-              className="btn btn-primary"
+              className={`btn btn-primary ${roleMode === 'admin' ? 'admin-btn' : ''}`}
               style={{ width: '100%', marginTop: '0.85rem' }}
               disabled={loading}
             >
