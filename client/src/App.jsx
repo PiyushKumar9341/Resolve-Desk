@@ -30,12 +30,14 @@ const App = () => {
   });
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [selectedBlockForForm, setSelectedBlockForForm] = useState('Block A');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavigate = (tab, payload) => {
     if (payload) {
       setSelectedBlockForForm(payload);
     }
     setActiveTab(tab);
+    setMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -112,10 +114,16 @@ const App = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
 
       <div className="main-wrapper">
-        <Navbar user={user} />
+        <Navbar 
+          user={user} 
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+        />
 
         {/* Admin Navigation Views */}
         {isAdmin && activeTab === 'admin-dashboard' && (

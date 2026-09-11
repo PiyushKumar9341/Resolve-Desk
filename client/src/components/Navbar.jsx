@@ -1,7 +1,7 @@
 import React from 'react';
-import { Bell, ShieldCheck } from 'lucide-react';
+import { Bell, ShieldCheck, Menu } from 'lucide-react';
 
-const Navbar = ({ user }) => {
+const Navbar = ({ user, mobileMenuOpen, setMobileMenuOpen }) => {
   const getInitial = (name) => {
     if (!name) return 'S';
     return name.charAt(0).toUpperCase();
@@ -9,15 +9,25 @@ const Navbar = ({ user }) => {
 
   return (
     <header className="top-navbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <ShieldCheck size={22} color="#2563eb" />
-        <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#1e293b' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        {setMobileMenuOpen && (
+          <button 
+            className="mobile-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Menu"
+          >
+            <Menu size={22} color="#1e293b" />
+          </button>
+        )}
+
+        <ShieldCheck size={22} color="#2563eb" className="brand-logo-icon" />
+        <span className="portal-header-title">
           College Grievance Portal
         </span>
       </div>
 
       <div className="user-badge">
-        <div style={{ padding: '0.5rem', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ padding: '0.45rem', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Bell size={18} color="#64748b" />
         </div>
         

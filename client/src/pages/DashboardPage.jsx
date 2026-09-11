@@ -363,20 +363,23 @@ const DashboardPage = ({ user, onNavigate }) => {
 
                           <button
                             type="button"
+                            className={`btn-upvote ${item.hasUpvoted ? 'upvote-anim' : ''}`}
                             onClick={(e) => handleToggleUpvote(e, item._id)}
                             disabled={upvotingId === item._id}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.35rem',
-                              padding: '0.35rem 0.8rem',
+                              padding: '0.38rem 0.85rem',
                               borderRadius: '20px',
                               fontSize: '0.78rem',
                               fontWeight: 700,
                               border: 'none',
                               cursor: 'pointer',
-                              background: item.hasUpvoted ? '#dc2626' : '#f1f5f9',
-                              color: item.hasUpvoted ? '#ffffff' : '#334155'
+                              background: item.hasUpvoted ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : '#f1f5f9',
+                              color: item.hasUpvoted ? '#ffffff' : '#334155',
+                              boxShadow: item.hasUpvoted ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none',
+                              transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
                             }}
                           >
                             <Flame size={13} color={item.hasUpvoted ? '#ffffff' : '#f97316'} />

@@ -51,6 +51,7 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
               <button
                 key={blk.id}
                 type="button"
+                className={`block-card-option ${isSelected ? 'selected' : ''}`}
                 onClick={() => onSelectBlock(blk.id)}
                 style={{
                   display: 'flex',
@@ -59,14 +60,14 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
                   padding: '0.85rem 1rem',
                   borderRadius: '14px',
                   border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
-                  background: isSelected ? '#eff6ff' : '#ffffff',
+                  background: isSelected ? 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' : '#ffffff',
                   color: isSelected ? '#1e40af' : '#334155',
                   fontWeight: isSelected ? 800 : 600,
                   fontSize: '0.88rem',
                   cursor: 'pointer',
                   textAlign: 'left',
-                  transition: 'all 0.2s ease',
-                  boxShadow: isSelected ? '0 4px 12px rgba(37, 99, 235, 0.15)' : 'none'
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: isSelected ? '0 6px 16px rgba(37, 99, 235, 0.2)' : '0 2px 4px rgba(0,0,0,0.02)'
                 }}
               >
                 <Icon size={18} color={isSelected ? '#2563eb' : '#64748b'} />
