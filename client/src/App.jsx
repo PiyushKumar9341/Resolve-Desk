@@ -29,6 +29,18 @@ const App = () => {
     return 'dashboard';
   });
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const [initialStatusFilter, setInitialStatusFilter] = useState('All');
+  const [selectedBlockForForm, setSelectedBlockForForm] = useState('Block A');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleNavigate = (tab, payload, statusFilter = 'All') => {
+    if (payload) {
+      setSelectedBlockForForm(payload);
+    }
+    setInitialStatusFilter(statusFilter || 'All');
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     if (token) {
@@ -99,44 +111,45 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <Sidebar
-        user={user}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={handleLogout}
-      />
-
       <div className="main-wrapper">
-        <Navbar user={user} />
+        <Navbar 
+          user={user} 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
 
         {/* Admin Navigation Views */}
         {isAdmin && activeTab === 'admin-dashboard' && (
-          <AdminDashboardPage user={user} onNavigate={setActiveTab} />
+          <AdminDashboardPage user={user} onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-complaints' && (
-          <AdminComplaintsPage onNavigate={setActiveTab} />
+          <AdminComplaintsPage onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-students' && (
-          <AdminStudentsPage onNavigate={setActiveTab} />
+          <AdminStudentsPage onNavigate={handleNavigate} />
         )}
 
         {isAdmin && activeTab === 'admin-analytics' && (
-          <AdminAnalyticsPage onNavigate={setActiveTab} />
+          <AdminAnalyticsPage onNavigate={handleNavigate} />
         )}
 
         {/* Student Navigation Views */}
         {!isAdmin && activeTab === 'dashboard' && (
-          <DashboardPage user={user} onNavigate={setActiveTab} />
+          <DashboardPage user={user} onNavigate={handleNavigate} />
         )}
 
         {!isAdmin && activeTab === 'new-complaint' && (
-          <NewComplaintPage onNavigate={setActiveTab} />
+          <NewComplaintPage onNavigate={handleNavigate} selectedBlock={selectedBlockForForm} />
         )}
 
         {!isAdmin && activeTab === 'my-complaints' && (
-          <MyComplaintsPage onNavigate={setActiveTab} />
+          <MyComplaintsPage onNavigate={handleNavigate} initialStatusFilter={initialStatusFilter} />
         )}
 
         {/* Shared Profile View */}

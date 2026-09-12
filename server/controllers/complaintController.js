@@ -1,5 +1,6 @@
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
+const { createNotificationHelper } = require('./notificationController');
 
 // Helper to generate readable custom complaint ID (e.g. GRV-2026-4829)
 function generateComplaintId() {
@@ -13,13 +14,13 @@ function generateComplaintId() {
 // @access  Private (Student)
 const createComplaint = async (req, res) => {
   try {
-    const { title, category, description } = req.body;
+    const { title, category, subCategory, blockLocation, description } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({ message: 'Complaint title is required.' });
     }
 
-    const validCategories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const validCategories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     if (!category || !validCategories.includes(category)) {
       return res.status(400).json({ message: 'Please select a valid complaint category.' });
     }
@@ -29,7 +30,6 @@ const createComplaint = async (req, res) => {
     }
 
     let complaintId = generateComplaintId();
-    // Ensure uniqueness
     let exists = await Complaint.findOne({ complaintId });
     while (exists) {
       complaintId = generateComplaintId();
@@ -41,11 +41,24 @@ const createComplaint = async (req, res) => {
       studentId: req.user._id,
       title: title.trim(),
       category,
+      subCategory: subCategory || 'General',
+      blockLocation: blockLocation || 'Other',
       description: description.trim(),
-      status: 'Pending'
+      status: 'Pending',
+      priority: 'Medium',
+      upvotes: []
     });
 
-    console.log(`[Complaint Created] ID: ${complaintId} by Student: ${req.user.email}`);
+    console.log(`[Complaint Created] ID: ${complaintId} by Student: ${req.user.email} (Block: ${blockLocation || 'Other'})`);
+
+    // Trigger notification to student
+    await createNotificationHelper({
+      recipient: req.user._id,
+      complaint: complaint._id,
+      title: `Grievance Logged #${complaintId}`,
+      message: `Your complaint "${title.trim()}" has been recorded under ${category}.`,
+      type: 'new_complaint'
+    });
 
     return res.status(201).json({
       success: true,
@@ -55,6 +68,154 @@ const createComplaint = async (req, res) => {
   } catch (error) {
     console.error('[Create Complaint Error]', error);
     return res.status(500).json({ message: 'Server error while submitting complaint.' });
+  }
+};
+
+// @desc    Toggle upvote (+1 / Me Too) on a complaint & recalculate auto-priority
+// @route   POST /api/complaints/:id/upvote
+// @access  Private (Student & Admin)
+const toggleUpvote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const complaint = await Complaint.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint record not found.' });
+    }
+
+    if (!complaint.upvotes) {
+      complaint.upvotes = [];
+    }
+
+    const upvoteIndex = complaint.upvotes.findIndex(
+      (uid) => uid.toString() === userId.toString()
+    );
+
+    let hasUpvoted = false;
+    if (upvoteIndex > -1) {
+      complaint.upvotes.splice(upvoteIndex, 1);
+      hasUpvoted = false;
+    } else {
+      complaint.upvotes.push(userId);
+      hasUpvoted = true;
+    }
+
+    // Smart Auto-Priority Threshold Engine
+    const count = complaint.upvotes.length;
+    if (count >= 15) {
+      complaint.priority = 'Urgent';
+    } else if (count >= 5) {
+      complaint.priority = 'High';
+    } else if (complaint.priority === 'High' || complaint.priority === 'Urgent') {
+      complaint.priority = 'Medium';
+    }
+
+    await complaint.save();
+
+    // Trigger notification to complaint author if upvoted by someone else
+    if (hasUpvoted && complaint.studentId && complaint.studentId.toString() !== userId.toString()) {
+      await createNotificationHelper({
+        recipient: complaint.studentId,
+        sender: userId,
+        complaint: complaint._id,
+        title: 'New Upvote Support 👍',
+        message: `A fellow student upvoted your grievance "${complaint.title}". Total support: ${complaint.upvotes.length}.`,
+        type: 'upvote'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      hasUpvoted,
+      upvoteCount: complaint.upvotes.length,
+      priority: complaint.priority,
+      message: hasUpvoted ? 'Upvoted successfully!' : 'Upvote removed.'
+    });
+  } catch (error) {
+    console.error('[Toggle Upvote Error]', error);
+    return res.status(500).json({ message: 'Server error while toggling upvote.' });
+  }
+};
+
+// @desc    Get all public campus complaints for Campus Feed
+// @route   GET /api/complaints/public
+// @access  Private (Student & Admin)
+const getPublicComplaints = async (req, res) => {
+  try {
+    const {
+      search = '',
+      category = 'All',
+      block = 'All',
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const query = {};
+
+    if (category && category !== 'All') {
+      query.category = category;
+    }
+
+    if (block && block !== 'All') {
+      query.blockLocation = block;
+    }
+
+    if (search && search.trim()) {
+      const term = search.trim();
+      query.$or = [
+        { complaintId: { $regex: term, $options: 'i' } },
+        { title: { $regex: term, $options: 'i' } },
+        { description: { $regex: term, $options: 'i' } },
+        { subCategory: { $regex: term, $options: 'i' } }
+      ];
+    }
+
+    const total = await Complaint.countDocuments(query);
+    const docs = await Complaint.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .populate('studentId', 'name email');
+
+    const formatted = docs.map((c) => {
+      const upvotesList = c.upvotes || [];
+      const hasUpvoted = req.user ? upvotesList.some(id => id.toString() === req.user._id.toString()) : false;
+
+      return {
+        _id: c._id,
+        complaintId: c.complaintId,
+        title: c.title,
+        category: c.category,
+        subCategory: c.subCategory || 'General',
+        blockLocation: c.blockLocation || 'Other',
+        description: c.description,
+        status: c.status,
+        priority: c.priority || 'Medium',
+        adminRemark: c.adminRemark || '',
+        createdAt: c.createdAt,
+        studentName: c.studentId?.name || 'Student',
+        studentEmail: c.studentId?.email || 'N/A',
+        upvoteCount: upvotesList.length,
+        hasUpvoted
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: formatted.length,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum) || 1,
+      complaints: formatted
+    });
+  } catch (error) {
+    console.error('[Get Public Complaints Error]', error);
+    return res.status(500).json({ message: 'Server error while fetching campus feed.' });
   }
 };
 
@@ -125,7 +286,7 @@ const getAdminStats = async (req, res) => {
       { $group: { _id: '$category', count: { $sum: 1 } } }
     ]);
 
-    const categories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const categories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     const categoryCounts = categories.map(cat => {
       const match = categoryStats.find(c => c._id === cat);
       return { category: cat, count: match ? match.count : 0 };
@@ -367,6 +528,9 @@ const updateComplaintAdmin = async (req, res) => {
       });
     }
 
+    const oldStatus = complaint.status;
+    const oldRemark = complaint.adminRemark;
+
     // Update status and append to statusHistory if status changed
     if (status && status !== complaint.status) {
       complaint.status = status;
@@ -389,6 +553,29 @@ const updateComplaintAdmin = async (req, res) => {
     if (assignedStaff !== undefined) complaint.assignedStaff = assignedStaff;
 
     await complaint.save();
+
+    // Trigger Notification to Student
+    if (complaint.studentId) {
+      if (status && status !== oldStatus) {
+        await createNotificationHelper({
+          recipient: complaint.studentId,
+          sender: req.user._id,
+          complaint: complaint._id,
+          title: `Status Updated to '${status}'`,
+          message: `Your grievance #${complaint.complaintId} status was changed to ${status}.${adminRemark ? ` Remark: "${adminRemark}"` : ''}`,
+          type: 'status_change'
+        });
+      } else if (adminRemark && adminRemark !== oldRemark) {
+        await createNotificationHelper({
+          recipient: complaint.studentId,
+          sender: req.user._id,
+          complaint: complaint._id,
+          title: 'New Admin Remark Added',
+          message: `Grievance Cell added a remark on #${complaint.complaintId}: "${adminRemark}"`,
+          type: 'remark'
+        });
+      }
+    }
 
     // Re-fetch with populated student and statusHistory changedBy details
     const updatedDoc = await Complaint.findById(complaint._id)
@@ -463,7 +650,7 @@ const getAdminAnalytics = async (req, res) => {
     });
 
     // Category Distribution & Category Resolution Rates
-    const categories = ['Hostel', 'Academic', 'Faculty', 'Infrastructure', 'Other'];
+    const categories = ['Hostel', 'Academic', 'Infrastructure', 'Canteen & Mess', 'Sports & Ground', 'Other'];
     const categoryAnalytics = await Promise.all(
       categories.map(async (cat) => {
         const total = await Complaint.countDocuments({ category: cat });
@@ -536,6 +723,60 @@ const getAdminAnalytics = async (req, res) => {
   }
 };
 
+// @desc    Check potential duplicate grievances by keyword/title similarity
+// @route   GET /api/complaints/check-duplicate
+// @access  Private (Student & Admin)
+const checkDuplicateComplaint = async (req, res) => {
+  try {
+    const { title = '', blockLocation = '' } = req.query;
+
+    if (!title.trim() || title.trim().length < 3) {
+      return res.status(200).json({ success: true, duplicates: [] });
+    }
+
+    const cleanTitle = title.trim();
+    const words = cleanTitle.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+    const query = {
+      status: { $in: ['Pending', 'In Progress'] }
+    };
+
+    if (blockLocation && blockLocation !== 'All') {
+      query.blockLocation = blockLocation;
+    }
+
+    if (words.length > 0) {
+      const regexPattern = words.join('|');
+      query.title = { $regex: regexPattern, $options: 'i' };
+    }
+
+    const matches = await Complaint.find(query)
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate('studentId', 'name email');
+
+    const formatted = matches.map(c => ({
+      _id: c._id,
+      complaintId: c.complaintId,
+      title: c.title,
+      category: c.category,
+      subCategory: c.subCategory || 'General',
+      blockLocation: c.blockLocation || 'Other',
+      upvoteCount: (c.upvotes || []).length,
+      priority: c.priority || 'Medium',
+      createdAt: c.createdAt
+    }));
+
+    return res.status(200).json({
+      success: true,
+      duplicates: formatted
+    });
+  } catch (error) {
+    console.error('[Check Duplicate Error]', error);
+    return res.status(500).json({ message: 'Server error while checking duplicates.' });
+  }
+};
+
 module.exports = {
   createComplaint,
   getMyComplaints,
@@ -543,7 +784,10 @@ module.exports = {
   getAdminStats,
   getAllComplaintsAdmin,
   updateComplaintAdmin,
-  getAdminAnalytics
+  getAdminAnalytics,
+  toggleUpvote,
+  getPublicComplaints,
+  checkDuplicateComplaint
 };
 
 

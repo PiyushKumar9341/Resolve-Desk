@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAdminComplaintsApi, updateComplaintAdminApi } from '../../services/api';
+import UserAvatar from '../../components/UserAvatar';
 import { 
   Search, 
   Filter, 
@@ -184,14 +185,14 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)' }}>
               Campus Grievance Management
             </h2>
-            <p style={{ fontSize: '0.88rem', color: '#64748b' }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
               Search, filter, prioritize, and manage complaints filed across all departments
             </p>
           </div>
-          <div style={{ fontSize: '0.85rem', fontWeight: 700, background: '#eff6ff', color: '#2563eb', padding: '0.4rem 0.9rem', borderRadius: '20px', border: '1px solid #bfdbfe' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, background: 'var(--primary-soft)', color: 'var(--primary)', padding: '0.4rem 0.9rem', borderRadius: '20px', border: '1px solid var(--border-accent)' }}>
             {totalRecords} Total Grievances
           </div>
         </div>
@@ -236,8 +237,9 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
             <option value="All">Category: All</option>
             <option value="Hostel">Hostel</option>
             <option value="Academic">Academic</option>
-            <option value="Faculty">Faculty</option>
             <option value="Infrastructure">Infrastructure</option>
+            <option value="Canteen & Mess">Canteen & Mess</option>
+            <option value="Sports & Ground">Sports & Ground</option>
             <option value="Other">Other</option>
           </select>
 
@@ -294,12 +296,12 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
             <div>Loading grievances from database...</div>
           </div>
         ) : complaints.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
-            <FileText size={48} color="#94a3b8" style={{ marginBottom: '0.75rem' }} />
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-subtle)', borderRadius: '14px', border: '1px dashed var(--border)' }}>
+            <FileText size={48} color="var(--text-subtle)" style={{ marginBottom: '0.75rem' }} />
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
               No grievances match current filters
             </h4>
-            <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
               Try loosening your search keywords or resetting status/priority filters.
             </p>
             <button className="btn btn-secondary" onClick={handleResetFilters}>
@@ -331,14 +333,14 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                         </strong>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                          <User size={15} color="#64748b" />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                          <UserAvatar user={{ name: item.studentName, email: item.studentEmail }} size={34} />
                           <div>
-                            <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.88rem' }}>
+                            <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.88rem' }}>
                               {item.studentName}
                             </div>
-                            <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                              {item.studentEmail}
+                            <div style={{ fontSize: '0.78rem', color: 'var(--primary)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.1rem' }}>
+                              <Mail size={12} /> {item.studentEmail}
                             </div>
                           </div>
                         </div>
@@ -439,13 +441,13 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                     &bull; {selectedComplaint.status}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   {selectedComplaint.title}
                 </h3>
               </div>
               <button 
                 onClick={closeReviewModal}
-                style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
+                style={{ background: 'var(--bg-subtle)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}
               >
                 <X size={18} />
               </button>
@@ -463,50 +465,58 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
             )}
 
             {/* Grievance Details Summary Grid */}
-            <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <span style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
-                    Filed By Student
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                    Filed By Student (Verified Identity)
                   </span>
-                  <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.92rem', marginTop: '0.15rem' }}>
-                    {selectedComplaint.studentName}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.35rem' }}>
+                    <UserAvatar user={{ name: selectedComplaint.studentName, email: selectedComplaint.studentEmail }} size={46} />
+                    <div>
+                      <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '0.98rem' }}>
+                        {selectedComplaint.studentName}
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--primary)', fontWeight: 700, marginTop: '0.15rem', background: 'var(--primary-soft)', padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Mail size={13} /> {selectedComplaint.studentEmail}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                    {selectedComplaint.studentEmail}
+                  <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+                    <strong>Roll No:</strong> {selectedComplaint.studentEmail ? selectedComplaint.studentEmail.split('@')[0].toUpperCase() : 'GCET-2023'} &bull; <strong>Status:</strong> OTP Signed
                   </div>
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                     Category & Department
                   </span>
-                  <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.92rem', marginTop: '0.15rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.92rem', marginTop: '0.15rem' }}>
                     {selectedComplaint.category}
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     {selectedComplaint.department || 'Department not assigned'}
                   </div>
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                     Timestamps
                   </span>
-                  <div style={{ fontSize: '0.82rem', color: '#334155', marginTop: '0.15rem' }}>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-main)', marginTop: '0.15rem' }}>
                     <strong>Filed:</strong> {formatDateTime(selectedComplaint.createdAt)}
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     <strong>Updated:</strong> {formatDateTime(selectedComplaint.updatedAt)}
                   </div>
                 </div>
               </div>
 
               <div>
-                <span style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
                   Grievance Description
                 </span>
-                <p style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6, marginTop: '0.3rem', background: '#ffffff', padding: '0.85rem', borderRadius: '10px', border: '1px solid #cbd5e1', whiteSpace: 'pre-wrap' }}>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', lineHeight: 1.6, marginTop: '0.3rem', background: 'var(--surface)', padding: '0.85rem', borderRadius: '10px', border: '1px solid var(--border)', whiteSpace: 'pre-wrap' }}>
                   {selectedComplaint.description}
                 </p>
               </div>
@@ -514,8 +524,8 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
 
             {/* Admin Actions Form */}
             <form onSubmit={handleUpdateSubmit} style={{ marginBottom: '1.75rem' }}>
-              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ShieldCheck size={18} color="#2563eb" />
+              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ShieldCheck size={18} color="var(--primary)" />
                 Administrative Actions & Resolution Controls
               </h4>
 
@@ -621,14 +631,14 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
             </form>
 
             {/* Status History Timeline */}
-            <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
-              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <History size={18} color="#64748b" />
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <History size={18} color="var(--primary)" />
                 Audit Trail & Status History Timeline
               </h4>
 
               {(!selectedComplaint.statusHistory || selectedComplaint.statusHistory.length === 0) ? (
-                <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', color: '#64748b', fontSize: '0.88rem', textAlign: 'center', border: '1px dashed #cbd5e1' }}>
+                <div style={{ padding: '1rem', background: 'var(--bg-subtle)', borderRadius: '12px', color: 'var(--text-muted)', fontSize: '0.88rem', textAlign: 'center', border: '1px dashed var(--border)' }}>
                   No previous status changes recorded for this grievance.
                 </div>
               ) : (

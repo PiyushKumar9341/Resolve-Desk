@@ -157,38 +157,38 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
 
           {/* Priority Distribution Cards */}
           <div className="card" style={{ marginBottom: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.4rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
               Priority Distribution
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
               Current severity levels assigned to active grievances
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
-              <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ background: 'var(--danger-soft)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
                 <span className="priority-pill Urgent" style={{ marginBottom: '0.5rem' }}>Urgent</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#e11d48' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--danger)' }}>
                   {analytics.priorityDistribution?.urgent || 0}
                 </div>
               </div>
 
-              <div style={{ background: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ background: 'var(--accent-soft)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
                 <span className="priority-pill High" style={{ marginBottom: '0.5rem' }}>High</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ea580c' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
                   {analytics.priorityDistribution?.high || 0}
                 </div>
               </div>
 
-              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ background: 'var(--primary-soft)', border: '1px solid var(--border-accent)', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
                 <span className="priority-pill Medium" style={{ marginBottom: '0.5rem' }}>Medium</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#2563eb' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>
                   {analytics.priorityDistribution?.medium || 0}
                 </div>
               </div>
 
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '12px', padding: '1rem', textAlign: 'center' }}>
                 <span className="priority-pill Low" style={{ marginBottom: '0.5rem' }}>Low</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--resolved-text)' }}>
                   {analytics.priorityDistribution?.low || 0}
                 </div>
               </div>
@@ -197,37 +197,37 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
 
           {/* Category Resolution Rates */}
           <div className="card" style={{ marginBottom: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.4rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
               Category Volume & Resolution Rates
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
               Resolution percentage breakdown per department category
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {(analytics.categoryAnalytics || []).map((catItem) => (
-                <div key={catItem.category} style={{ background: '#f8fafc', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+                <div key={catItem.category} style={{ background: 'var(--bg-subtle)', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                     <div>
-                      <strong style={{ fontSize: '0.95rem', color: '#1e293b' }}>
+                      <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>
                         {catItem.category}
                       </strong>
-                      <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: '0.75rem' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '0.75rem' }}>
                         {catItem.resolved} resolved / {catItem.total} total ({catItem.pending} pending)
                       </span>
                     </div>
-                    <span style={{ fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--resolved-text)', fontSize: '0.95rem' }}>
                       {catItem.resolutionRate}% Resolved
                     </span>
                   </div>
 
-                  <div className="progress-bar-container" style={{ height: '10px' }}>
+                  <div className="progress-bar-container">
                     <div 
                       className="progress-bar-fill" 
                       style={{ 
-                        width: `${catItem.resolutionRate}%`, 
+                        width: `${catItem.resolutionRate}%`,
                         background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)' 
-                      }} 
+                      }}
                     />
                   </div>
                 </div>
@@ -235,23 +235,23 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* 14-Day Submission Trend Chart */}
+          {/* Submission Trend Chart */}
           <div className="card">
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TrendingUp size={20} color="#2563eb" />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={20} color="var(--primary)" />
               14-Day Grievance Submission Trend
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
               Daily volume of newly submitted grievances over the last two weeks
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: '180px', paddingBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', overflowX: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: '180px', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
               {(analytics.submissionTrend || []).map((item, idx) => {
                 const maxCount = Math.max(1, ...analytics.submissionTrend.map(t => t.count));
                 const barHeight = item.count > 0 ? Math.max(20, Math.round((item.count / maxCount) * 140)) : 6;
                 return (
                   <div key={idx} style={{ flex: 1, minWidth: '36px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: item.count > 0 ? '#2563eb' : '#94a3b8' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: item.count > 0 ? 'var(--primary)' : 'var(--text-subtle)' }}>
                       {item.count}
                     </span>
                     <div 
@@ -259,13 +259,13 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
                         width: '100%', 
                         maxWidth: '28px', 
                         height: `${barHeight}px`, 
-                        background: item.count > 0 ? 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)' : '#e2e8f0', 
+                        background: item.count > 0 ? 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)' : 'var(--border)', 
                         borderRadius: '6px 6px 0 0',
                         transition: 'height 0.3s ease'
                       }}
                       title={`${item.date}: ${item.count} complaints`}
                     />
-                    <span style={{ fontSize: '0.7rem', color: '#64748b', whiteSpace: 'nowrap', marginTop: '0.2rem' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', marginTop: '0.2rem' }}>
                       {item.date}
                     </span>
                   </div>

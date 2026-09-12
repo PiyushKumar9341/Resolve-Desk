@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getStudentsAdminApi, getStudentDetailsAdminApi } from '../../services/api';
+import UserAvatar from '../../components/UserAvatar';
 import { 
   Users, 
   Search, 
@@ -117,11 +118,11 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
             <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
               Enrolled Student Directory
             </h2>
-            <p style={{ fontSize: '0.88rem', color: '#64748b' }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
               Search registered college students, view filed grievances, and inspect complaint histories
             </p>
           </div>
-          <div style={{ fontSize: '0.85rem', fontWeight: 700, background: '#f0f9ff', color: '#0284c7', padding: '0.4rem 0.9rem', borderRadius: '20px', border: '1px solid #bae6fd' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, background: 'var(--primary-soft)', color: 'var(--primary)', padding: '0.4rem 0.9rem', borderRadius: '20px', border: '1px solid var(--border-accent)' }}>
             {totalRecords} Enrolled Students
           </div>
         </div>
@@ -166,12 +167,12 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
             <div>Loading student directory...</div>
           </div>
         ) : students.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
-            <Users size={48} color="#94a3b8" style={{ marginBottom: '0.75rem' }} />
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-subtle)', borderRadius: '14px', border: '1px dashed var(--border)' }}>
+            <Users size={48} color="var(--text-subtle)" style={{ marginBottom: '0.75rem' }} />
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
               No students found
             </h4>
-            <p style={{ color: '#64748b', fontSize: '0.88rem' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
               Try broadening your search query or reset search keywords.
             </p>
           </div>
@@ -195,11 +196,9 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
                     return (
                       <tr key={student._id}>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                            <div className="avatar" style={{ background: '#e0f2fe', color: '#0369a1', width: '32px', height: '32px', fontSize: '0.85rem' }}>
-                              {student.name ? student.name.charAt(0).toUpperCase() : 'S'}
-                            </div>
-                            <strong style={{ color: '#1e293b', fontSize: '0.9rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <UserAvatar user={student} size={34} />
+                            <strong style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>
                               {student.name || 'Student'}
                             </strong>
                           </div>
@@ -279,21 +278,21 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
       {(selectedStudent || loadingDetail || detailError) && (
         <div className="modal-overlay" onClick={closeReviewModal}>
           <div className="modal-content modal-lg" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '92vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <GraduationCap size={24} color="#0284c7" />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' }}>
+                <GraduationCap size={24} color="var(--primary)" />
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   Student Profile & Grievance History
                 </h3>
               </div>
-              <button onClick={closeStudentModal} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+              <button onClick={closeStudentModal} style={{ background: 'var(--bg-subtle)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
                 <X size={18} />
               </button>
             </div>
 
             {loadingDetail && (
-              <div style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b' }}>
-                <RefreshCw size={32} className="spin" color="#0284c7" style={{ margin: '0 auto 1rem auto' }} />
+              <div style={{ textAlign: 'center', padding: '3.5rem', color: 'var(--text-muted)' }}>
+                <RefreshCw size={32} className="spin" color="var(--primary)" style={{ margin: '0 auto 1rem auto' }} />
                 <div>Fetching student profile records...</div>
               </div>
             )}
@@ -307,35 +306,38 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
             {selectedStudent && !loadingDetail && (
               <>
                 {/* Student Info Card */}
-                <div style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid #bae6fd' }}>
+                <div style={{ background: 'var(--bg-subtle)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0369a1', marginBottom: '0.2rem' }}>
-                        {selectedStudent.name}
-                      </h4>
-                      <div style={{ color: '#0284c7', fontSize: '0.9rem', fontWeight: 600 }}>
-                        {selectedStudent.email}
-                      </div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '0.3rem' }}>
-                        Registered since {formatDate(selectedStudent.createdAt)}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <UserAvatar user={selectedStudent} size={54} />
+                      <div>
+                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                          {selectedStudent.name}
+                        </h4>
+                        <div style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600 }}>
+                          {selectedStudent.email}
+                        </div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.3rem' }}>
+                          Registered since {formatDate(selectedStudent.createdAt)}
+                        </div>
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <div style={{ background: '#ffffff', padding: '0.6rem 1rem', borderRadius: '12px', textAlign: 'center', border: '1px solid #cbd5e1' }}>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2563eb' }}>
+                      <div style={{ background: 'var(--surface)', padding: '0.6rem 1rem', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
                           {selectedStudent.complaintStats?.total || 0}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                           Total Filed
                         </div>
                       </div>
 
-                      <div style={{ background: '#ffffff', padding: '0.6rem 1rem', borderRadius: '12px', textAlign: 'center', border: '1px solid #cbd5e1' }}>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#059669' }}>
+                      <div style={{ background: 'var(--surface)', padding: '0.6rem 1rem', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--resolved-text)' }}>
                           {selectedStudent.complaintStats?.resolved || 0}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                           Resolved
                         </div>
                       </div>
@@ -344,14 +346,14 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
                 </div>
 
                 {/* Grievances Submitted by Student */}
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem' }}>
+                <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>
                   Grievances Submitted ({studentComplaints.length})
                 </h4>
 
                 {studentComplaints.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '2.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                    <Inbox size={40} color="#94a3b8" style={{ marginBottom: '0.5rem' }} />
-                    <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                  <div style={{ textAlign: 'center', padding: '2.5rem', background: 'var(--bg-subtle)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                    <Inbox size={40} color="var(--text-subtle)" style={{ marginBottom: '0.5rem' }} />
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                       This student has not submitted any complaints yet.
                     </p>
                   </div>

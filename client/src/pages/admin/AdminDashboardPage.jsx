@@ -92,12 +92,12 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', position: 'relative', zIndex: 2 }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '0.75rem', border: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.1)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', marginBottom: '0.75rem', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff' }}>
               <ShieldCheck size={14} color="#60a5fa" />
-              <span>Administrative Console &bull; Live Operations</span>
+              <span style={{ color: '#ffffff', fontWeight: 600 }}>Administrative Console &bull; Live Operations</span>
             </div>
             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
-              Welcome, {user?.name || 'Administrator'} 👋
+              Welcome, <span className="text-gradient-hero">{user?.name || 'Administrator'}</span> 👋
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.92rem' }}>
               Portal Authority Session active &bull; Account: <strong style={{ color: '#cbd5e1' }}>{user?.email}</strong>
@@ -216,12 +216,12 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
               {categoryCounts.map((catItem) => {
                 const percentage = stats.total > 0 ? Math.round((catItem.count / stats.total) * 100) : 0;
                 return (
-                  <div key={catItem.category} style={{ background: '#f8fafc', padding: '1rem', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+                  <div key={catItem.category} style={{ background: 'var(--bg-subtle)', padding: '1rem', borderRadius: '14px', border: '1px solid var(--border)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
                         {catItem.category}
                       </span>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#2563eb' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>
                         {catItem.count} ({percentage}%)
                       </span>
                     </div>
@@ -244,10 +244,10 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
           <div className="card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
                   Recent Campus Grievances
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   Latest grievances submitted by enrolled students
                 </p>
               </div>
@@ -255,7 +255,7 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
               {recentComplaints.length > 0 && (
                 <button
                   onClick={() => onNavigate('admin-complaints')}
-                  style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                 >
                   View All Grievances
                   <ArrowRight size={16} />
@@ -264,12 +264,12 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
             </div>
 
             {recentComplaints.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#f8fafc', borderRadius: '14px', border: '1px dashed #cbd5e1' }}>
-                <Inbox size={42} color="#94a3b8" style={{ marginBottom: '0.75rem' }} />
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+              <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: 'var(--bg-subtle)', borderRadius: '14px', border: '1px dashed var(--border)' }}>
+                <Inbox size={42} color="var(--text-subtle)" style={{ marginBottom: '0.75rem' }} />
+                <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
                   No grievances in the database yet
                 </h4>
-                <p style={{ color: '#64748b', fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto' }}>
                   When students submit complaints through their portal, they will appear here in real time.
                 </p>
               </div>

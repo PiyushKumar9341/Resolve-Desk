@@ -45,6 +45,21 @@ export const getStatsApi = async () => {
   return response.data;
 };
 
+export const getPublicComplaintsApi = async (params = {}) => {
+  const response = await api.get('/complaints/public', { params });
+  return response.data;
+};
+
+export const toggleUpvoteApi = async (id) => {
+  const response = await api.post(`/complaints/${id}/upvote`);
+  return response.data;
+};
+
+export const checkDuplicateComplaintApi = async (params = {}) => {
+  const response = await api.get('/complaints/check-duplicate', { params });
+  return response.data;
+};
+
 // Admin Complaint Services
 export const getAdminStatsApi = async () => {
   const response = await api.get('/complaints/admin/stats');
@@ -85,6 +100,27 @@ export const getProfileApi = async () => {
 
 export const updateProfileApi = async (name) => {
   const response = await api.put('/users/profile', { name });
+  return response.data;
+};
+
+// Notification Services
+export const getNotificationsApi = async () => {
+  const response = await api.get('/notifications');
+  return response.data;
+};
+
+export const markNotificationReadApi = async (id) => {
+  const response = await api.put(`/notifications/${id}/read`);
+  return response.data;
+};
+
+export const markAllNotificationsReadApi = async () => {
+  const response = await api.put('/notifications/read-all');
+  return response.data;
+};
+
+export const deleteNotificationApi = async (id) => {
+  const response = await api.delete(`/notifications/${id}`);
   return response.data;
 };
 

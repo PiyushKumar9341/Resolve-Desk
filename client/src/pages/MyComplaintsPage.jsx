@@ -3,10 +3,10 @@ import ComplaintModal from '../components/ComplaintModal';
 import { getMyComplaintsApi } from '../services/api';
 import { FileText, PlusCircle, Search, Tag, Calendar, Filter } from 'lucide-react';
 
-const MyComplaintsPage = ({ onNavigate }) => {
+const MyComplaintsPage = ({ onNavigate, initialStatusFilter = 'All' }) => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterStatus, setFilterStatus] = useState(initialStatusFilter || 'All');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
@@ -50,8 +50,10 @@ const MyComplaintsPage = ({ onNavigate }) => {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>My Complaints History</h2>
-            <p style={{ fontSize: '0.88rem', color: '#64748b' }}>Track and review all grievances submitted under your account</p>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
+              My Complaints <span className="text-gradient">History</span>
+            </h2>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Track and review all grievances submitted under your account</p>
           </div>
 
           <button className="btn btn-primary" onClick={() => onNavigate('new-complaint')}>
@@ -61,7 +63,7 @@ const MyComplaintsPage = ({ onNavigate }) => {
         </div>
 
         {/* Filter and Search Bar */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', background: '#f8fafc', padding: '0.85rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', background: 'var(--bg-subtle)', padding: '0.85rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
             <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
@@ -86,9 +88,9 @@ const MyComplaintsPage = ({ onNavigate }) => {
                   borderRadius: '20px',
                   fontSize: '0.8rem',
                   fontWeight: 600,
-                  border: filterStatus === status ? '1px solid #2563eb' : '1px solid #cbd5e1',
-                  background: filterStatus === status ? '#2563eb' : '#ffffff',
-                  color: filterStatus === status ? '#ffffff' : '#475569',
+                  border: filterStatus === status ? '1px solid var(--primary)' : '1px solid var(--border)',
+                  background: filterStatus === status ? 'var(--gradient-btn)' : 'var(--bg-subtle)',
+                  color: filterStatus === status ? '#ffffff' : 'var(--text-muted)',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease'
                 }}
@@ -107,12 +109,12 @@ const MyComplaintsPage = ({ onNavigate }) => {
             Loading your grievance history...
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-            <FileText size={48} color="#94a3b8" style={{ marginBottom: '1rem' }} />
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-subtle)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+            <FileText size={48} color="var(--text-subtle)" style={{ marginBottom: '1rem' }} />
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
               {complaints.length === 0 ? 'No complaints yet. Raise your first complaint.' : 'No complaints match your filter criteria.'}
             </h4>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
               {complaints.length === 0 ? 'Submit an official grievance to start tracking resolution progress.' : 'Try adjusting your search keyword or status filter.'}
             </p>
             {complaints.length === 0 && (
@@ -138,25 +140,25 @@ const MyComplaintsPage = ({ onNavigate }) => {
                 {filteredComplaints.map((item) => (
                   <tr key={item._id} onClick={() => setSelectedComplaint(item)}>
                     <td>
-                      <strong style={{ color: '#2563eb', fontFamily: 'monospace', letterSpacing: '0.5px' }}>
+                      <strong style={{ color: 'var(--primary)', fontFamily: 'monospace', letterSpacing: '0.5px' }}>
                         {item.complaintId}
                       </strong>
                     </td>
                     <td>
-                      <strong style={{ color: '#1e293b' }}>{item.title}</strong>
-                      <div style={{ fontSize: '0.78rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
+                      <strong style={{ color: 'var(--text-main)' }}>{item.title}</strong>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
                         {item.description}
                       </div>
                     </td>
                     <td>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', color: '#475569' }}>
-                        <Tag size={13} color="#94a3b8" />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        <Tag size={13} color="var(--text-subtle)" />
                         {item.category}
                       </span>
                     </td>
-                    <td style={{ color: '#64748b' }}>
+                    <td style={{ color: 'var(--text-muted)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}>
-                        <Calendar size={13} color="#94a3b8" />
+                        <Calendar size={13} color="var(--text-subtle)" />
                         {formatDate(item.createdAt)}
                       </span>
                     </td>
