@@ -23,7 +23,8 @@ import {
   MessageSquare,
   History,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Mail
 } from 'lucide-react';
 
 const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {

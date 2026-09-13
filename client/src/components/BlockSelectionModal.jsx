@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Building, GraduationCap, Utensils, Home, Sparkles, X, CheckCircle2 } from 'lucide-react';
+import { MapPin, Building, GraduationCap, Utensils, Home, Sparkles, X, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const GCET_BLOCKS = [
   { id: 'Block A', label: 'Block A', icon: Building },
@@ -8,7 +8,8 @@ const GCET_BLOCKS = [
   { id: 'Block D', label: 'Block D', icon: Building },
   { id: 'GBS Block', label: 'GBS Block', icon: GraduationCap },
   { id: 'Main Canteen / Food Court', label: 'Main Canteen', icon: Utensils },
-  { id: 'Hostel Block', label: 'Hostel Block', icon: Home },
+  { id: 'Boys Hostel', label: 'Boys Hostel', icon: Home },
+  { id: 'Girls Hostel', label: 'Girls Hostel', icon: Home },
   { id: 'Sports Complex / Ground', label: 'Sports Complex', icon: Sparkles },
   { id: 'Other', label: 'Other Location', icon: MapPin },
 ];
@@ -23,27 +24,43 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+    <div className="modal-overlay block-modal-overlay">
+      <div className="modal-content block-selection-modal-card" onClick={(e) => e.stopPropagation()}>
+        {/* Header matching Navbar Brand Pill */}
+        <div className="block-modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '42px', height: '42px', background: 'var(--primary-soft)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', border: '1px solid var(--border-accent)' }}>
+            <div 
+              className="brand-logo-badge"
+              style={{ 
+                width: '42px', 
+                height: '42px', 
+                borderRadius: '12px', 
+                background: 'linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-teal) 100%)',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 6px 16px var(--primary-glow)',
+                flexShrink: 0
+              }}
+            >
               <MapPin size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                Select Campus Location / <span className="text-gradient">Block</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'var(--primary-soft)', padding: '0.15rem 0.55rem', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.2rem', border: '1px solid var(--border-accent)' }}>
+                <ShieldCheck size={12} />
+                <span>Session Campus Verification</span>
+              </div>
+              <h3 style={{ fontSize: '1.18rem', fontWeight: 800, margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+                Select Campus <span className="text-gradient">Block / Location</span>
               </h3>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
-                Choose your building to view & submit block grievances
-              </p>
             </div>
           </div>
           {onClose && (
             <button 
               onClick={onClose}
               className="modal-close-btn"
+              title="Close & use current location"
               style={{ 
                 borderRadius: '50%', 
                 width: '34px', 
@@ -51,7 +68,8 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
-                cursor: 'pointer' 
+                cursor: 'pointer',
+                flexShrink: 0
               }}
             >
               <X size={18} />
@@ -59,8 +77,12 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
           )}
         </div>
 
-        {/* Translucent Frosted Glass Block Selection Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '1.75rem' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', fontWeight: 500 }}>
+          Welcome! Please choose your campus location to load active block grievances and raise new issues:
+        </p>
+
+        {/* Translucent Navbar-Styled Block Options Grid */}
+        <div className="block-selection-grid">
           {GCET_BLOCKS.map((blk) => {
             const Icon = blk.icon;
             const isSelected = tempBlock === blk.id;
@@ -69,42 +91,40 @@ const BlockSelectionModal = ({ selectedBlock, onSelectBlock, onClose }) => {
               <button
                 key={blk.id}
                 type="button"
-                className={`block-card-option ${isSelected ? 'selected' : ''}`}
+                className={`block-card-item ${isSelected ? 'selected' : ''}`}
                 onClick={() => setTempBlock(blk.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  padding: '0.85rem 1rem',
-                  borderRadius: '14px',
-                  border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
-                  background: isSelected 
-                    ? 'var(--primary-soft)' 
-                    : 'var(--bg-subtle)',
-                  color: isSelected ? 'var(--primary)' : 'var(--text-main)',
-                  fontWeight: isSelected ? 800 : 600,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: isSelected ? '0 8px 20px var(--primary-glow)' : 'var(--shadow-sm)'
-                }}
               >
-                <Icon size={18} color={isSelected ? 'var(--primary)' : 'var(--text-muted)'} />
-                <span>{blk.label}</span>
-                {isSelected && <CheckCircle2 size={16} color="var(--primary)" style={{ marginLeft: 'auto' }} />}
+                <div className="block-icon-wrapper">
+                  <Icon size={18} color={isSelected ? 'var(--primary)' : 'var(--text-muted)'} />
+                </div>
+                <span className="block-card-title">{blk.label}</span>
+                {isSelected && (
+                  <CheckCircle2 size={18} color="var(--primary)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
+                )}
               </button>
             );
           })}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div className="block-modal-footer">
           <button
             className="btn btn-primary"
             onClick={handleConfirm}
-            style={{ width: '100%', padding: '0.85rem', fontSize: '0.95rem', borderRadius: '14px' }}
+            style={{ 
+              width: '100%', 
+              padding: '0.8rem 1.25rem', 
+              fontSize: '0.95rem', 
+              borderRadius: '14px',
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              boxShadow: '0 8px 24px var(--primary-glow)'
+            }}
           >
-            Confirm & Enter {tempBlock}
+            <span>Confirm & Enter {tempBlock}</span>
+            <ArrowRight size={18} />
           </button>
         </div>
       </div>
