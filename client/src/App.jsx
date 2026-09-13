@@ -79,6 +79,7 @@ const App = () => {
     setToken(userToken);
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.removeItem('gcet_block_selected_session');
     setActiveTab(userData.role === 'admin' ? 'admin-dashboard' : 'dashboard');
   };
 
@@ -87,6 +88,7 @@ const App = () => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('gcet_block_selected_session');
     setActiveTab('dashboard');
   };
 

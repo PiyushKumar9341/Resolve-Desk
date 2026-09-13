@@ -12,7 +12,16 @@ const CATEGORY_ITEMS = [
 ];
 
 const SUB_CATEGORIES = {
-  Hostel: ['Wi-Fi & Network', 'Plumbing & Water', 'Electricity & Fan/AC', 'Cleanliness & Hygiene', 'Furniture & Bed'],
+  Hostel: [
+    'Wi-Fi & Internet Network',
+    'Plumbing, Washroom & Water Supply',
+    'Electricity, Fan, Light & AC',
+    'Cleanliness & Hygiene',
+    'Furniture & Room Bed',
+    'Hostel Mess & Food Quality',
+    'Security & Gate Concerns',
+    'Other Hostel Issue'
+  ],
   Academic: ['Classroom Smart Board/Projector', 'Classroom AC & Ventilation', 'Lab Equipment & Computers', 'Department Equipment', 'General Academic Resource / Library'],
   Infrastructure: ['Washroom & Hygiene', 'Common Area AC & Cooling', 'Lighting & Electrical', 'Building Civil & Maintenance'],
   'Canteen & Mess': ['Food Quality & Hygiene', 'Seating & Cleanliness', 'General Canteen/Mess Facility'],
@@ -30,11 +39,24 @@ const SUB_CATEGORIES = {
 const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
   const blockLocation = selectedBlock || 'Block A';
   
+  const isHostelBlock = blockLocation.toLowerCase().includes('hostel');
   const isSportsBlock = blockLocation.toLowerCase().includes('sports') || blockLocation.toLowerCase().includes('ground');
-  
+  const isCanteenBlock = blockLocation.toLowerCase().includes('canteen') || blockLocation.toLowerCase().includes('food');
+
+  const getDefaultCategory = (blockStr) => {
+    const loc = blockStr.toLowerCase();
+    if (loc.includes('hostel')) return 'Hostel';
+    if (loc.includes('sports') || loc.includes('ground')) return 'Sports & Ground';
+    if (loc.includes('canteen') || loc.includes('food')) return 'Canteen & Mess';
+    return 'Academic';
+  };
+
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState(isSportsBlock ? 'Sports & Ground' : 'Hostel');
-  const [subCategory, setSubCategory] = useState(isSportsBlock ? 'Badminton & Tennis Court Maintenance' : 'Wi-Fi & Network');
+  const [category, setCategory] = useState(() => getDefaultCategory(blockLocation));
+  const [subCategory, setSubCategory] = useState(() => {
+    const defaultCat = getDefaultCategory(blockLocation);
+    return (SUB_CATEGORIES[defaultCat] || ['General'])[0];
+  });
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,10 +64,10 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
 
   // Auto update category if selectedBlock changes
   useEffect(() => {
-    if (isSportsBlock) {
-      setCategory('Sports & Ground');
-      setSubCategory('Badminton & Tennis Court Maintenance');
-    }
+    const autoCat = getDefaultCategory(blockLocation);
+    setCategory(autoCat);
+    const subList = SUB_CATEGORIES[autoCat] || ['General'];
+    setSubCategory(subList[0]);
   }, [blockLocation]);
 
   // Duplicate detection state
@@ -170,7 +192,7 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
 
         <form onSubmit={handleSubmit}>
           {/* Locked Block Location Display */}
-          <div style={{ background: 'var(--primary-soft)', padding: '0.85rem 1.1rem', borderRadius: '14px', border: '1px solid var(--border-accent)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ background: 'var(--primary-soft)', padding: '0.85rem 1.1rem', borderRadius: '14px', border: '1px solid var(--border-accent)', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 700 }}>
               <MapPin size={18} color="var(--primary)" />
               <span>Campus Building: <strong style={{ color: 'var(--text-main)', fontSize: '1.05rem' }}>{blockLocation}</strong></span>
@@ -178,6 +200,52 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
             <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--primary)', background: 'var(--surface-raised)', padding: '0.25rem 0.65rem', borderRadius: '8px', border: '1px solid var(--border-accent)' }}>
               📍 Active Location
             </span>
+          </div>
+
+          {/* Prominently Highlighted Upvote & Auto-Escalation Info Banner */}
+          <div 
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%)', 
+              padding: '1.1rem 1.25rem', 
+              borderRadius: '18px', 
+              marginBottom: '1.75rem', 
+              border: '1.5px solid var(--border-accent)',
+              boxShadow: '0 8px 20px var(--primary-glow)',
+              display: 'flex', 
+              gap: '0.85rem', 
+              alignItems: 'flex-start'
+            }}
+          >
+            <div 
+              style={{ 
+                width: '38px', 
+                height: '38px', 
+                borderRadius: '12px', 
+                background: 'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)', 
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                marginTop: '2px'
+              }}
+            >
+              <HelpCircle size={22} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                  Grievance Routing & Escalation Notice
+                </span>
+                <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '0.15rem 0.55rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 800, border: '1px solid rgba(239, 68, 68, 0.3)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Flame size={12} /> 🚨 AUTO-URGENT ESCALATION
+                </span>
+              </div>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                Your grievance will be filed directly under <span style={{ background: 'var(--primary)', color: '#ffffff', padding: '0.1rem 0.55rem', borderRadius: '6px', fontWeight: 800, fontSize: '0.82rem' }}>{blockLocation}</span>. Other affected students in this block can <span style={{ color: '#f97316', fontWeight: 800 }}>🔥 Upvote (+1)</span> your issue to automatically escalate it to <strong style={{ color: '#ef4444' }}>URGENT Priority</strong> for faster resolution!
+              </p>
+            </div>
           </div>
 
           {/* 1. Primary Category Selector */}
@@ -294,14 +362,7 @@ const NewComplaintPage = ({ onNavigate, selectedBlock }) => {
             />
           </div>
 
-          <div style={{ background: 'var(--bg-subtle)', padding: '1.1rem', borderRadius: '16px', marginBottom: '1.75rem', border: '1px solid var(--border)', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-            <HelpCircle size={20} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
-              Your grievance will be filed directly under <strong>{blockLocation}</strong>. Other affected students in this block can <strong>Upvote (+1)</strong> your issue to automatically escalate it to <strong>URGENT Priority</strong>!
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.75rem' }}>
             <button
               type="button"
               className="btn btn-secondary"
