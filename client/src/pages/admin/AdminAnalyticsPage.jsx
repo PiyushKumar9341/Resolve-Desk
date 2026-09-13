@@ -46,10 +46,10 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)' }}>
               Portal Grievance Analytics & Insights
             </h2>
-            <p style={{ fontSize: '0.88rem', color: '#64748b' }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
               Real-time computed resolution percentage, category volume, priority distribution, and submission trends
             </p>
           </div>
@@ -63,10 +63,10 @@ const AdminAnalyticsPage = ({ onNavigate }) => {
       {loading && (
         <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', marginBottom: '2rem' }}>
           <RefreshCw size={36} className="spin" color="#059669" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.3rem' }}>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
             Computing Analytics & Aggregations
           </h3>
-          <p style={{ color: '#64748b', fontSize: '0.88rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
             Calculating resolution speeds, category efficiency, and historical submission trends...
           </p>
         </div>

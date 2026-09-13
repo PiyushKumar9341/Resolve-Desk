@@ -74,3 +74,5 @@ Resolve-Desk is a full-stack College Student Complaint & Grievance Management Po
 - **Student Regression**: `scratch/verify_student_flow.js` executed — student submission, tracking, and profile features remain 100% intact.
 - **Production Build**: `npm run build` executed — `vite build` completed successfully in 3.37s with 0 errors.
 - **Branch Discipline**: 100% of work resides exclusively on `nishant-admin-panel`. No commits pushed to remote.
+- **Known Minor Note**: Some inline icon props (e.g. `<User color="#64748b" />`) remain hardcoded; while text contrast is 100% fixed via CSS variables (`var(--text-main)` / `var(--text-muted)`), icon color props can be updated in a future pass if dark-mode icon styling is desired.
+

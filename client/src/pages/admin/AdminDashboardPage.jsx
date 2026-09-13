@@ -119,10 +119,10 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
       {loading && (
         <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', marginBottom: '2rem' }}>
           <RefreshCw size={36} className="spin" color="#3b82f6" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.3rem' }}>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.3rem' }}>
             Loading Administrative Analytics
           </h3>
-          <p style={{ color: '#64748b', fontSize: '0.88rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
             Aggregating complaint records and calculating portal statistics...
           </p>
         </div>
@@ -204,10 +204,10 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
           {/* Category Distribution Breakdown */}
           <div className="card" style={{ marginBottom: '2rem' }}>
             <div style={{ marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 Grievance Volume by Category
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 Distribution of filed concerns across college departments
               </p>
             </div>
@@ -303,20 +303,20 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <User size={14} color="#64748b" />
                             <div>
-                              <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.88rem' }}>
+                              <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.88rem' }}>
                                 {item.studentName}
                               </div>
-                              <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
                                 {item.studentEmail}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <strong style={{ color: '#1e293b' }}>{item.title}</strong>
+                          <strong style={{ color: 'var(--text-main)' }}>{item.title}</strong>
                         </td>
                         <td>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', color: '#475569' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                             <Tag size={13} color="#94a3b8" />
                             {item.category}
                           </span>
@@ -326,7 +326,7 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
                             {item.priority || 'Not set'}
                           </span>
                         </td>
-                        <td style={{ color: '#64748b' }}>
+                        <td style={{ color: 'var(--text-muted)' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}>
                             <Calendar size={13} color="#94a3b8" />
                             {formatDate(item.createdAt)}

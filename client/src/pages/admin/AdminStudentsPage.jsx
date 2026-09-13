@@ -115,7 +115,7 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)' }}>
               Enrolled Student Directory
             </h2>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
@@ -162,7 +162,7 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
       {/* Student List Table */}
       <div className="card">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b' }}>
+          <div style={{ textAlign: 'center', padding: '3.5rem', color: 'var(--text-muted)' }}>
             <RefreshCw size={32} className="spin" color="#0284c7" style={{ margin: '0 auto 1rem auto' }} />
             <div>Loading student directory...</div>
           </div>
@@ -203,10 +203,10 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
                             </strong>
                           </div>
                         </td>
-                        <td style={{ color: '#475569', fontSize: '0.88rem' }}>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
                           {student.email}
                         </td>
-                        <td style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                           {formatDate(student.createdAt)}
                         </td>
                         <td>
@@ -250,7 +250,7 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
 
             {/* Pagination */}
             <div className="pagination-bar">
-              <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 Page <strong>{page}</strong> of <strong>{totalPages}</strong> ({totalRecords} students)
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -379,10 +379,10 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
                               </strong>
                             </td>
                             <td>
-                              <strong style={{ color: '#1e293b' }}>{c.title}</strong>
+                              <strong style={{ color: 'var(--text-main)' }}>{c.title}</strong>
                             </td>
                             <td>
-                              <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+                              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                                 {c.category}
                               </span>
                             </td>
@@ -391,7 +391,7 @@ const AdminStudentsPage = ({ onNavigate, onSelectComplaint }) => {
                                 {c.priority || 'Not set'}
                               </span>
                             </td>
-                            <td style={{ color: '#64748b', fontSize: '0.85rem' }}>
+                            <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                               {formatDate(c.createdAt)}
                             </td>
                             <td>

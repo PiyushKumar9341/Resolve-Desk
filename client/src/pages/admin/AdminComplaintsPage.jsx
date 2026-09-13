@@ -322,7 +322,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
       {/* Complaints Table Card */}
       <div className="card">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b' }}>
+          <div style={{ textAlign: 'center', padding: '3.5rem', color: 'var(--text-muted)' }}>
             <RefreshCw size={32} className="spin" color="#3b82f6" style={{ margin: '0 auto 1rem auto' }} />
             <div>Loading grievances from database...</div>
           </div>
@@ -403,7 +403,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                           {item.priority || 'Not set'}
                         </span>
                       </td>
-                      <td style={{ color: '#64748b' }}>
+                      <td style={{ color: 'var(--text-muted)' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}>
                           <Calendar size={13} color="#94a3b8" />
                           {formatDate(item.createdAt)}
@@ -431,7 +431,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
 
             {/* Pagination Controls */}
             <div className="pagination-bar">
-              <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 Showing page <strong>{page}</strong> of <strong>{totalPages}</strong> ({totalRecords} total records)
               </div>
 
@@ -688,7 +688,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                           <span className={`badge ${hist.status ? hist.status.replace(' ', '-') : 'Pending'}`}>
                             &bull; {hist.status}
                           </span>
-                          <span style={{ fontWeight: 600, color: '#475569' }}>
+                          <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>
                             Changed by: {hist.changedBy?.name || hist.changedBy?.email || hist.changedBy || 'Admin'}
                           </span>
                         </div>
