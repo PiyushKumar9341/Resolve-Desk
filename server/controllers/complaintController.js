@@ -339,6 +339,8 @@ const getAllComplaintsAdmin = async (req, res) => {
       status = 'All',
       category = 'All',
       priority = 'All',
+      blockLocation = 'All',
+      block = 'All',
       sortBy = 'createdAt',
       sortOrder = 'desc',
       page = 1,
@@ -351,9 +353,17 @@ const getAllComplaintsAdmin = async (req, res) => {
 
     const query = {};
 
-    // Filter by status
-    if (status && status !== 'All') {
+    // Filter by status (Default 'All' / 'Active' excludes 'Resolved' to show active grievances)
+    if (status === 'All' || status === 'Active') {
+      query.status = { $ne: 'Resolved' };
+    } else if (status && status !== 'ALL_WITH_RESOLVED') {
       query.status = status;
+    }
+
+    // Filter by blockLocation / campus block
+    const activeBlockFilter = blockLocation !== 'All' ? blockLocation : block;
+    if (activeBlockFilter && activeBlockFilter !== 'All') {
+      query.blockLocation = activeBlockFilter;
     }
 
     // Filter by category
@@ -440,6 +450,8 @@ const getAllComplaintsAdmin = async (req, res) => {
             complaintId: 1,
             title: 1,
             category: 1,
+            subCategory: 1,
+            blockLocation: 1,
             description: 1,
             status: 1,
             priority: 1,
@@ -473,6 +485,8 @@ const getAllComplaintsAdmin = async (req, res) => {
       complaintId: c.complaintId,
       title: c.title,
       category: c.category,
+      subCategory: c.subCategory || 'General',
+      blockLocation: c.blockLocation || 'Other',
       description: c.description,
       status: c.status,
       priority: c.priority || 'Medium',

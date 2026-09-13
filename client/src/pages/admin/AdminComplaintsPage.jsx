@@ -24,8 +24,22 @@ import {
   History,
   ShieldCheck,
   AlertTriangle,
-  Mail
+  Mail,
+  MapPin
 } from 'lucide-react';
+
+const GCET_BLOCK_OPTIONS = [
+  'Block A',
+  'Block B',
+  'Block C',
+  'Block D',
+  'GBS Block',
+  'Main Canteen / Food Court',
+  'Boys Hostel',
+  'Girls Hostel',
+  'Sports Complex / Ground',
+  'Other'
+];
 
 const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
   const [complaints, setComplaints] = useState([]);
@@ -37,6 +51,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterCategory, setFilterCategory] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
+  const [filterBlock, setFilterBlock] = useState('All');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [page, setPage] = useState(1);
@@ -56,7 +71,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
 
   useEffect(() => {
     fetchComplaints();
-  }, [filterStatus, filterCategory, filterPriority, sortBy, sortOrder, page]);
+  }, [filterStatus, filterCategory, filterPriority, filterBlock, sortBy, sortOrder, page]);
 
   // Debounced search trigger
   useEffect(() => {
@@ -76,6 +91,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
         status: filterStatus,
         category: filterCategory,
         priority: filterPriority,
+        blockLocation: filterBlock,
         sortBy,
         sortOrder,
         page,
@@ -100,6 +116,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
     setFilterStatus('All');
     setFilterCategory('All');
     setFilterPriority('All');
+    setFilterBlock('All');
     setSortBy('createdAt');
     setSortOrder('desc');
     setPage(1);
@@ -222,11 +239,24 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
             onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
             title="Filter by Status"
           >
-            <option value="All">Status: All</option>
+            <option value="All">Status: Active (Excludes Resolved)</option>
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
             <option value="Rejected">Rejected</option>
+            <option value="Resolved">Resolved</option>
+            <option value="ALL_WITH_RESOLVED">All (Including Resolved)</option>
+          </select>
+
+          <select 
+            className="filter-select"
+            value={filterBlock}
+            onChange={(e) => { setFilterBlock(e.target.value); setPage(1); }}
+            title="Filter by Campus Block / Location"
+          >
+            <option value="All">Location: All Blocks</option>
+            {GCET_BLOCK_OPTIONS.map((blk) => (
+              <option key={blk} value={blk}>{blk}</option>
+            ))}
           </select>
 
           <select 
@@ -318,7 +348,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                     <th>Complaint ID</th>
                     <th>Student Details</th>
                     <th>Title & Description</th>
-                    <th>Category</th>
+                    <th>Location & Category</th>
                     <th>Priority</th>
                     <th>Submitted Date</th>
                     <th>Status</th>
@@ -348,19 +378,25 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                       </td>
                       <td>
                         <div style={{ maxWidth: '280px' }}>
-                          <strong style={{ color: '#1e293b', display: 'block', fontSize: '0.9rem' }}>
+                          <strong style={{ color: 'var(--text-main)', display: 'block', fontSize: '0.92rem', fontWeight: 700, letterSpacing: '-0.01em', marginBottom: '0.15rem' }}>
                             {item.title}
                           </strong>
-                          <div style={{ fontSize: '0.78rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {item.description}
                           </div>
                         </div>
                       </td>
                       <td>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', color: '#475569' }}>
-                          <Tag size={13} color="#94a3b8" />
-                          {item.category}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-start' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', background: 'var(--primary-soft)', padding: '0.15rem 0.55rem', borderRadius: '6px', border: '1px solid var(--border-accent)' }}>
+                            <MapPin size={11} />
+                            {item.blockLocation || 'Other'}
+                          </span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                            <Tag size={12} color="#94a3b8" />
+                            {item.category}
+                          </span>
+                        </div>
                       </td>
                       <td>
                         <span className={`priority-pill ${item.priority ? item.priority.replace(' ', '-') : 'Not-set'}`}>
@@ -442,7 +478,7 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
                     &bull; {selectedComplaint.status}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.015em', margin: 0 }}>
                   {selectedComplaint.title}
                 </h3>
               </div>
@@ -490,13 +526,14 @@ const AdminComplaintsPage = ({ onNavigate, onSelectComplaint }) => {
 
                 <div>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
-                    Category & Department
+                    Location & Category
                   </span>
-                  <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.92rem', marginTop: '0.15rem' }}>
-                    {selectedComplaint.category}
+                  <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.92rem', marginTop: '0.15rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <MapPin size={15} color="var(--primary)" />
+                    {selectedComplaint.blockLocation || 'Other'}
                   </div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                    {selectedComplaint.department || 'Department not assigned'}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                    {selectedComplaint.category} {selectedComplaint.department ? `• ${selectedComplaint.department}` : ''}
                   </div>
                 </div>
 

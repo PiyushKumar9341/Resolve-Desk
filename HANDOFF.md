@@ -41,6 +41,7 @@ Resolve-Desk is a full-stack College Student Complaint & Grievance Management Po
 | **Step 11** | Admin Profile | ✅ **DONE** | Updated `ProfilePage.jsx` to dynamically render `Administrator Account` badge and handle admin profile updates. |
 | **Step 12** | Notifications | ✅ **DONE (Skipped as per spec)** | Excluded custom notification microservices to prevent unnecessary system overhead; auth email OTP flow remains active. |
 | **Step 13** | Settings | ✅ **DONE (Skipped as per spec)** | Excluded fake/placeholder setting toggles to adhere strictly to production quality standards. |
+| **Step 14** | Block-Wise Filtering & Active View | ✅ **DONE** | Added `blockLocation` filtering across Admin Panel (reusing `GCET_BLOCKS` string values), default exclusion of resolved complaints (`{ $ne: 'Resolved' }`), complaint title visual emphasis, student name verification, and design system visual unification. |
 
 ---
 
