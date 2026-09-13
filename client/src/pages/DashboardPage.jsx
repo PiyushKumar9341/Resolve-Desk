@@ -23,9 +23,9 @@ const DashboardPage = ({ user, onNavigate }) => {
     return localStorage.getItem('user_gcet_block') || 'Block A';
   });
   
-  // Show popup modal if block has not been selected in current session
+  // Always show popup modal on login until block is confirmed in current session
   const [showBlockModal, setShowBlockModal] = useState(() => {
-    return !localStorage.getItem('user_gcet_block');
+    return !sessionStorage.getItem('gcet_block_selected_session');
   });
 
   const [activeTabMode, setActiveTabMode] = useState('block-feed'); // 'block-feed' | 'my-complaints'
@@ -50,6 +50,12 @@ const DashboardPage = ({ user, onNavigate }) => {
   const handleSelectBlock = (newBlock) => {
     setSelectedBlock(newBlock);
     localStorage.setItem('user_gcet_block', newBlock);
+    sessionStorage.setItem('gcet_block_selected_session', 'true');
+  };
+
+  const handleCloseBlockModal = () => {
+    sessionStorage.setItem('gcet_block_selected_session', 'true');
+    setShowBlockModal(false);
   };
 
   const fetchStats = async () => {
@@ -493,7 +499,7 @@ const DashboardPage = ({ user, onNavigate }) => {
         <BlockSelectionModal
           selectedBlock={selectedBlock}
           onSelectBlock={handleSelectBlock}
-          onClose={() => setShowBlockModal(false)}
+          onClose={handleCloseBlockModal}
         />
       )}
 
