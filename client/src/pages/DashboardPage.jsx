@@ -36,10 +36,6 @@ const DashboardPage = ({ user, onNavigate }) => {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
-    fetchStats();
-  }, []);
-
-  useEffect(() => {
     if (activeTabMode === 'block-feed') {
       fetchBlockComplaints();
     } else {
@@ -58,23 +54,32 @@ const DashboardPage = ({ user, onNavigate }) => {
     setShowBlockModal(false);
   };
 
-  const fetchStats = async () => {
-    try {
-      const statsRes = await getStatsApi();
-      if (statsRes.success) {
-        setStats(statsRes.stats);
-      }
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
   const fetchBlockComplaints = async () => {
     setLoading(true);
     try {
       const res = await getPublicComplaintsApi({ block: selectedBlock, limit: 15 });
       if (res.success) {
-        setBlockComplaints(res.complaints || []);
+        const rawList = res.complaints || [];
+        // Filter out Resolved / Rejected from active block feed
+        const activeList = rawList.filter(c => c.status === 'Pending' || c.status === 'In Progress');
+        
+        setBlockComplaints(activeList);
+
+        if (res.stats) {
+          setStats(res.stats);
+        } else {
+          // Robust fail-safe calculation
+          const pending = activeList.filter(c => c.status === 'Pending').length;
+          const inProgress = activeList.filter(c => c.status === 'In Progress').length;
+          const resolved = rawList.filter(c => c.status === 'Resolved').length;
+
+          setStats({
+            total: pending + inProgress + resolved,
+            pending,
+            inProgress,
+            resolved
+          });
+        }
       }
     } catch (error) {
       console.error('Error fetching block complaints:', error);
@@ -88,7 +93,19 @@ const DashboardPage = ({ user, onNavigate }) => {
     try {
       const res = await getMyComplaintsApi();
       if (res.success) {
-        setMyComplaints(res.complaints || []);
+        const list = res.complaints || [];
+        setMyComplaints(list);
+        
+        const pending = list.filter(c => c.status === 'Pending').length;
+        const inProgress = list.filter(c => c.status === 'In Progress').length;
+        const resolved = list.filter(c => c.status === 'Resolved').length;
+
+        setStats({
+          total: list.length,
+          pending,
+          inProgress,
+          resolved
+        });
       }
     } catch (error) {
       console.error('Error fetching my complaints:', error);
@@ -207,6 +224,20 @@ const DashboardPage = ({ user, onNavigate }) => {
             + Raise Complaint for {selectedBlock}
           </button>
         </div>
+      </div>
+
+      {/* Dynamic Metric Stats Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', padding: '0 0.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.45rem', margin: 0 }}>
+          {activeTabMode === 'block-feed' ? (
+            <>📍 <span className="text-gradient">{selectedBlock}</span> Live Grievance Overview</>
+          ) : (
+            <>👤 My Personal Grievance Summary</>
+          )}
+        </h3>
+        <span style={{ fontSize: '0.78rem', color: 'var(--primary)', background: 'var(--primary-soft)', padding: '0.2rem 0.6rem', borderRadius: '8px', border: '1px solid var(--border-accent)', fontWeight: 700 }}>
+          {activeTabMode === 'block-feed' ? `Showing live stats for ${selectedBlock}` : 'Showing your submitted issues'}
+        </span>
       </div>
 
       {/* Stats Counter Section */}
