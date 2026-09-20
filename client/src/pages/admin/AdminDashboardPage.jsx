@@ -28,6 +28,7 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
   });
   const [categoryCounts, setCategoryCounts] = useState([]);
   const [recentComplaints, setRecentComplaints] = useState([]);
+  const [roomHotspots, setRoomHotspots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -51,6 +52,7 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
         });
         setCategoryCounts(data.categoryCounts || []);
         setRecentComplaints(data.recentComplaints || []);
+        setRoomHotspots(data.roomHotspots || []);
       }
     } catch (err) {
       console.error('[Admin Dashboard Fetch Error]', err);
@@ -180,6 +182,43 @@ const AdminDashboardPage = ({ user, onNavigate }) => {
               >
                 Review Urgent Cases
               </button>
+            </div>
+          )}
+
+          {/* 🔥 Room Hotspots Alert Banner */}
+          {roomHotspots.length > 0 && (
+            <div 
+              style={{ 
+                background: 'var(--accent-soft)', 
+                border: '1.5px solid var(--accent)', 
+                borderRadius: '16px', 
+                padding: '1.1rem 1.25rem', 
+                marginBottom: '1.75rem',
+                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.15)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <AlertTriangle size={20} color="var(--accent)" />
+                  <strong style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>
+                    🔥 Room Maintenance Hotspot Warning ({roomHotspots.length} Rooms with Multiple Active Complaints)
+                  </strong>
+                </div>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  Multiple issues reported in single room
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                {roomHotspots.map((hs, idx) => (
+                  <div key={idx} style={{ background: 'var(--surface-raised)', padding: '0.65rem 0.95rem', borderRadius: '12px', border: '1px solid var(--border)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span>📍 <strong style={{ color: 'var(--text-main)' }}>{hs.blockLocation}</strong> &bull; <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{hs.roomNumber}</span></span>
+                    <span style={{ background: '#ef4444', color: '#ffffff', fontSize: '0.72rem', fontWeight: 800, padding: '0.1rem 0.55rem', borderRadius: '999px' }}>
+                      {hs.activeCount} Active Complaints
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

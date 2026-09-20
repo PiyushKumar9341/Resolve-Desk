@@ -14,7 +14,7 @@ function generateComplaintId() {
 // @access  Private (Student)
 const createComplaint = async (req, res) => {
   try {
-    const { title, category, subCategory, blockLocation, description } = req.body;
+    const { title, category, subCategory, blockLocation, floorLocation, roomNumber, description } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({ message: 'Complaint title is required.' });
@@ -43,6 +43,8 @@ const createComplaint = async (req, res) => {
       category,
       subCategory: subCategory || 'General',
       blockLocation: blockLocation || 'Other',
+      floorLocation: floorLocation || 'Ground Floor',
+      roomNumber: roomNumber ? roomNumber.trim() : '',
       description: description.trim(),
       status: 'Pending',
       priority: 'Medium',
@@ -139,8 +141,6 @@ const toggleUpvote = async (req, res) => {
 };
 
 // @desc    Get all public campus complaints for Campus Feed
-// @route   GET /api/complaints/public
-// @access  Private (Student & Admin)
 const getPublicComplaints = async (req, res) => {
   try {
     const {
@@ -155,14 +155,17 @@ const getPublicComplaints = async (req, res) => {
     const limitNum = Math.max(1, parseInt(limit, 10) || 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const query = {};
+    // Strict query for active feed: only Pending & In Progress grievances
+    const query = {
+      status: { $in: ['Pending', 'In Progress'] }
+    };
 
     if (category && category !== 'All') {
       query.category = category;
     }
 
     if (block && block !== 'All') {
-      query.blockLocation = block;
+      query.blockLocation = { $regex: new RegExp(`^${block.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') };
     }
 
     if (search && search.trim()) {
@@ -175,7 +178,16 @@ const getPublicComplaints = async (req, res) => {
       ];
     }
 
-    const total = await Complaint.countDocuments(query);
+    // Calculate precise Block-Specific Stats (Pending, In Progress, Resolved & Total)
+    const blockMatch = block && block !== 'All' 
+      ? { blockLocation: { $regex: new RegExp(`^${block.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i') } } 
+      : {};
+
+    const total = await Complaint.countDocuments({ ...blockMatch, status: { $ne: 'Rejected' } });
+    const pending = await Complaint.countDocuments({ ...blockMatch, status: 'Pending' });
+    const inProgress = await Complaint.countDocuments({ ...blockMatch, status: 'In Progress' });
+    const resolved = await Complaint.countDocuments({ ...blockMatch, status: 'Resolved' });
+
     const docs = await Complaint.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -193,6 +205,8 @@ const getPublicComplaints = async (req, res) => {
         category: c.category,
         subCategory: c.subCategory || 'General',
         blockLocation: c.blockLocation || 'Other',
+        floorLocation: c.floorLocation || 'Ground Floor',
+        roomNumber: c.roomNumber || '',
         description: c.description,
         status: c.status,
         priority: c.priority || 'Medium',
@@ -209,6 +223,12 @@ const getPublicComplaints = async (req, res) => {
       success: true,
       count: formatted.length,
       total,
+      stats: {
+        total,
+        pending,
+        inProgress,
+        resolved
+      },
       page: pageNum,
       totalPages: Math.ceil(total / limitNum) || 1,
       complaints: formatted
@@ -303,11 +323,40 @@ const getAdminStats = async (req, res) => {
       complaintId: doc.complaintId,
       title: doc.title,
       category: doc.category,
+      subCategory: doc.subCategory || 'General',
+      blockLocation: doc.blockLocation || 'Other',
+      floorLocation: doc.floorLocation || 'Ground Floor',
+      roomNumber: doc.roomNumber || '',
       status: doc.status,
       priority: doc.priority || 'Medium',
       studentName: doc.studentId?.name || 'Student',
       studentEmail: doc.studentId?.email || 'N/A',
       createdAt: doc.createdAt
+    }));
+
+    // Room Hotspot Alert Aggregation (Rooms with 2+ active complaints)
+    const roomHotspotsRaw = await Complaint.aggregate([
+      {
+        $match: {
+          status: { $in: ['Pending', 'In Progress'] },
+          roomNumber: { $exists: true, $ne: '' }
+        }
+      },
+      {
+        $group: {
+          _id: { blockLocation: '$blockLocation', roomNumber: '$roomNumber' },
+          count: { $sum: 1 }
+        }
+      },
+      { $match: { count: { $gte: 2 } } },
+      { $sort: { count: -1 } },
+      { $limit: 5 }
+    ]);
+
+    const roomHotspots = roomHotspotsRaw.map(h => ({
+      blockLocation: h._id.blockLocation,
+      roomNumber: h._id.roomNumber,
+      activeCount: h.count
     }));
 
     return res.status(200).json({
@@ -321,7 +370,8 @@ const getAdminStats = async (req, res) => {
         urgent
       },
       categoryCounts,
-      recentComplaints
+      recentComplaints,
+      roomHotspots
     });
   } catch (error) {
     console.error('[Get Admin Stats Error]', error);
@@ -728,9 +778,9 @@ const getAdminAnalytics = async (req, res) => {
 // @access  Private (Student & Admin)
 const checkDuplicateComplaint = async (req, res) => {
   try {
-    const { title = '', blockLocation = '' } = req.query;
+    const { title = '', blockLocation = '', roomNumber = '', subCategory = '' } = req.query;
 
-    if (!title.trim() || title.trim().length < 3) {
+    if ((!title.trim() || title.trim().length < 3) && !roomNumber.trim()) {
       return res.status(200).json({ success: true, duplicates: [] });
     }
 
@@ -745,14 +795,20 @@ const checkDuplicateComplaint = async (req, res) => {
       query.blockLocation = blockLocation;
     }
 
-    if (words.length > 0) {
+    if (roomNumber && roomNumber.trim()) {
+      query.roomNumber = { $regex: roomNumber.trim(), $options: 'i' };
+    }
+
+    if (subCategory && subCategory !== 'General') {
+      query.subCategory = subCategory;
+    } else if (words.length > 0) {
       const regexPattern = words.join('|');
       query.title = { $regex: regexPattern, $options: 'i' };
     }
 
     const matches = await Complaint.find(query)
       .sort({ createdAt: -1 })
-      .limit(3)
+      .limit(10)
       .populate('studentId', 'name email');
 
     const formatted = matches.map(c => ({
@@ -762,6 +818,8 @@ const checkDuplicateComplaint = async (req, res) => {
       category: c.category,
       subCategory: c.subCategory || 'General',
       blockLocation: c.blockLocation || 'Other',
+      floorLocation: c.floorLocation || 'Ground Floor',
+      roomNumber: c.roomNumber || '',
       upvoteCount: (c.upvotes || []).length,
       priority: c.priority || 'Medium',
       createdAt: c.createdAt

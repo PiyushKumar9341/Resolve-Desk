@@ -30,6 +30,14 @@ const complaintSchema = new mongoose.Schema(
       type: String,
       default: 'Other'
     },
+    floorLocation: {
+      type: String,
+      default: 'Ground Floor'
+    },
+    roomNumber: {
+      type: String,
+      default: ''
+    },
     description: {
       type: String,
       required: true,

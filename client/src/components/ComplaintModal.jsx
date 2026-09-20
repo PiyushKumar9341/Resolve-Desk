@@ -35,10 +35,14 @@ const ComplaintModal = ({ complaint, onClose }) => {
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             <Tag size={16} />
             <strong style={{ color: 'var(--text-main)' }}>Category:</strong> {complaint.category}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--primary)', background: 'var(--primary-soft)', padding: '0.25rem 0.65rem', borderRadius: '8px', border: '1px solid var(--border-accent)', fontWeight: 700 }}>
+            <span>📍 {complaint.blockLocation || 'Campus'} {complaint.floorLocation ? `• ${complaint.floorLocation}` : ''} {complaint.roomNumber ? `• ${complaint.roomNumber}` : ''}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
