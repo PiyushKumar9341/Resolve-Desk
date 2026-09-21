@@ -141,6 +141,32 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--bg-subtle);
+}
+
+/* Custom Sleek Glassmorphism Scrollbar matching Project Theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-btn);
+  border-radius: 9999px;
+  border: 2px solid var(--bg-subtle);
+  box-shadow: 0 2px 8px var(--primary-glow);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--brand-blue) 0%, var(--teal) 100%);
+  box-shadow: 0 4px 14px var(--primary-glow);
 }
 
 body {
