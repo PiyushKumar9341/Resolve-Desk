@@ -1245,9 +1245,33 @@ select option {
 .form-input:focus, select:focus, .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: var(--surface);
+  background: var(--surface-raised);
   box-shadow: 0 0 0 4px var(--primary-soft), 0 4px 16px rgba(99, 102, 241, 0.12);
   transform: translateY(-1px);
+}
+
+/* Chrome / Edge / Browser Autofill Dark Mode Override (Prevents White Background) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-main) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-raised) inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+[data-theme='dark'] input:-webkit-autofill,
+[data-theme='dark'] textarea:-webkit-autofill {
+  -webkit-text-fill-color: #f3f4f6 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #16161c inset !important;
 }
 
 /* OTP Code Input Box */
@@ -1259,6 +1283,7 @@ select option {
   font-family: monospace;
   background: var(--surface-raised);
   border-color: var(--border-accent);
+  color: var(--text-main);
 }
 
 /* Alerts */
@@ -1298,6 +1323,24 @@ select option {
   border: 1px solid #bfdbfe;
 }
 
+[data-theme='dark'] .alert-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+[data-theme='dark'] .alert-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+[data-theme='dark'] .alert-info {
+  background: rgba(99, 102, 241, 0.12);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
 .dev-otp-banner {
   background: linear-gradient(135deg, rgba(255, 251, 230, 0.85) 0%, rgba(255, 241, 184, 0.85) 100%);
   backdrop-filter: blur(10px);
@@ -1311,6 +1354,18 @@ select option {
   flex-direction: column;
   gap: 0.35rem;
   box-shadow: 0 4px 12px rgba(212, 136, 6, 0.1);
+}
+
+[data-theme='dark'] .dev-otp-banner {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border: 1px dashed rgba(245, 158, 11, 0.35) !important;
+  color: #fbbf24 !important;
+}
+
+[data-theme='dark'] .dev-otp-banner strong {
+  background: #18181f !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
 }
 
 /* Category Selection Pills for New Complaint */
