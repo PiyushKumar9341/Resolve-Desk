@@ -826,17 +826,6 @@ h4, h5, h6 {
   box-shadow: var(--card-shadow);
 }
 
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
 .stat-card:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: var(--card-shadow-hover);
