@@ -338,7 +338,7 @@ const LoginPage = ({ onLoginSuccess }) => {
               Demo Verification Code Active:
             </div>
             <div>
-              Use Code: <strong style={{ fontSize: '1.15rem', letterSpacing: '3px', color: '#0f172a', background: '#ffffff', padding: '3px 10px', borderRadius: '6px', border: '1px solid #ffe58f' }}>{devOtpCode}</strong>
+              Use Code: <strong style={{ fontSize: '1.15rem', letterSpacing: '3px', color: 'var(--text-main)', background: 'var(--surface-raised)', padding: '3px 10px', borderRadius: '6px', border: '1px solid var(--border)' }}>{devOtpCode}</strong>
             </div>
             <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>
               (Logged on server terminal. Configure EMAIL_PASS in .env for live SMTP delivery).
