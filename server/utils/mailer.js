@@ -1,35 +1,45 @@
 const nodemailer = require('nodemailer');
 
 /**
- * Sends OTP email using Nodemailer if credentials are set,
- * or logs to server console as fallback for offline/demo mode.
+ * Sends OTP email using Nodemailer.
+ * Optimized for Vercel / Cloud deployments.
  */
 async function sendOtpEmail(recipientEmail, otpCode) {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
+  const emailUser = process.env.EMAIL_USER ? process.env.EMAIL_USER.trim() : null;
+  // Remove any spaces if user copied Google App Password with spaces
+  const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : null;
 
   console.log(`\n==================================================`);
-  console.log(`🔑 [DEMO / DEV OTP LOG] Recipient: ${recipientEmail}`);
-  console.log(`👉 Verification OTP Code: ${otpCode}`);
+  console.log(`🔑 [OTP DISPATCH] Recipient: ${recipientEmail}`);
+  console.log(`👉 Code: ${otpCode}`);
   console.log(`==================================================\n`);
 
   if (!emailUser || !emailPass) {
-    console.log(`[Mailer Info] EMAIL_USER/EMAIL_PASS not configured in .env. Operating in Dev/Presentation mode.`);
+    console.warn(`⚠️ [Mailer Warning] EMAIL_USER ya EMAIL_PASS missing hai environment variables me!`);
     return {
       success: true,
       deliveredViaEmail: false,
       devOtp: otpCode,
-      message: 'OTP generated. Demo/Console fallback active.'
+      message: 'EMAIL_USER or EMAIL_PASS not set in environment variables.'
     };
   }
 
   try {
+    // Explicit SMTP configuration for reliable delivery on Vercel/Cloud servers
     const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE || 'gmail',
+      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      port: Number(process.env.EMAIL_PORT) || 465,
+      secure: (Number(process.env.EMAIL_PORT) || 465) === 465, // true for 465 (SSL), false for 587 (TLS)
       auth: {
         user: emailUser,
         pass: emailPass
-      }
+      },
+      tls: {
+        rejectUnauthorized: false
+      },
+      connectionTimeout: 10000, // 10s timeout
+      greetingTimeout: 10000,
+      socketTimeout: 10000
     });
 
     const htmlContent = `
@@ -51,27 +61,27 @@ async function sendOtpEmail(recipientEmail, otpCode) {
       </div>
     `;
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"College Grievance Portal" <${emailUser}>`,
       to: recipientEmail,
       subject: `Your Login Verification Code: ${otpCode}`,
       html: htmlContent
     });
 
-    console.log(`[Mailer Success] OTP sent via email to ${recipientEmail}`);
+    console.log(`✅ [Mailer Success] OTP sent via email to ${recipientEmail} | Message ID: ${info.messageId}`);
     return {
       success: true,
       deliveredViaEmail: true,
-      message: 'OTP sent to email address.'
+      message: 'OTP sent to email address successfully.'
     };
   } catch (error) {
-    console.error(`[Mailer Error] Failed to send email via SMTP: ${error.message}`);
-    // Graceful fallback so presentation demo never halts on network/credential error
+    console.error(`❌ [Mailer Error] Failed to send email via SMTP:`, error.message);
     return {
       success: true,
       deliveredViaEmail: false,
       devOtp: otpCode,
-      message: `Email sending failed (${error.message}). Console OTP fallback active.`
+      errorDetail: error.message,
+      message: `Email sending failed (${error.message}).`
     };
   }
 }

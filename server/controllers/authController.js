@@ -81,9 +81,10 @@ const sendOtp = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      deliveredViaEmail: mailResult.deliveredViaEmail,
       message: mailResult.deliveredViaEmail
         ? `OTP sent successfully to ${normalizedEmail}`
-        : `OTP sent! (Demo mode fallback active)`,
+        : (mailResult.message || `OTP sent (Fallback mode active)`),
       devOtp: mailResult.devOtp || null,
       cooldownSeconds: 60
     });
